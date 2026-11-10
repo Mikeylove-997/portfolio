@@ -4,34 +4,37 @@ export type Project = {
   description: string;
   techStack: string[];
   features: string[];
+  repoUrl: string;
 };
 
 export const projects: Project[] = [
   {
-    slug: "task-manager-app",
-    title: "Task Manager App",
+    slug: "payactiv-ewa-api",
+    title: "Payactiv EWA Prediction API",
     description:
-      "A full-stack task manager where users can create projects, add tasks with due dates, and track completion progress in real time.",
-    techStack: ["React", "Next.js", "Node.js", "MongoDB"],
+      "SCU practicum project: a machine learning service that identifies users in financial distress and predicts Early Wage Access product usage frequency, served through a documented REST API.",
+    techStack: ["Python", "scikit-learn", "REST API", "MCP"],
     features: [
-      "Create, edit, and delete tasks with due dates",
-      "Progress dashboard that updates in real time",
-      "Filter tasks by status and priority",
-      "User authentication with sessions",
+      "ML models for financial-distress risk and EWA usage-frequency prediction",
+      "REST API with Procfile ready for cloud deployment",
+      "Model Context Protocol (MCP) server for AI tool integration",
+      "API documentation, integration, and validation reports",
     ],
+    repoUrl: "https://github.com/Mikeylove-997/payactiv-ewa-api",
   },
   {
-    slug: "weather-dashboard",
-    title: "Weather Dashboard",
+    slug: "inventory-cli",
+    title: "Store Inventory CLI",
     description:
-      "A weather dashboard that consumes a public REST API to show current conditions and a 7-day forecast for any city the user searches.",
-    techStack: ["JavaScript", "REST API", "CSS Grid"],
+      "A Python 3 command-line application for managing a small store's product inventory, with JSON persistence and robust input validation (ISBA 2438 Assignment 1).",
+    techStack: ["Python", "argparse", "JSON"],
     features: [
-      "Search current weather by city name",
-      "7-day forecast with temperature charts",
-      "Geolocation support for local weather",
-      "Responsive layout that works on mobile",
+      "Add, list, get, update, and delete products from the command line",
+      "Low-stock report with configurable reorder thresholds",
+      "All data persisted to a local JSON file with schema validation",
+      "Strict input validation for names, prices, quantities, and IDs",
     ],
+    repoUrl: "https://github.com/Mikeylove-997/inventory-cli",
   },
 ];
 

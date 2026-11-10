@@ -6,12 +6,13 @@ export const metadata: Metadata = {
 };
 
 const skills = [
+  "Python",
+  "R",
+  "SQL",
   "TypeScript",
   "React",
   "Next.js",
-  "Node.js",
-  "Python",
-  "SQL",
+  "Tableau",
   "Git",
 ];
 
@@ -20,18 +21,18 @@ export default function AboutPage() {
     <main className="container page">
       <h1>About Me</h1>
       <section className="card">
-        <h2>Hi, I&apos;m Your Name</h2>
+        <h2>Hi, I&apos;m Mike Zhao</h2>
         <p>
           I am a student at Santa Clara University studying information
-          systems and web development. I enjoy turning ideas into working web
-          applications — from designing the interface to wiring up the server
-          behind it.
+          systems. I like building things end to end — from Python analytics
+          and machine learning projects to web applications with Next.js.
         </p>
         <p>
-          Lately I have been building with Next.js, exploring the App Router,
-          Server Components, and Server Actions. This portfolio itself is an
-          example: it uses dynamic routes for projects and a Server Action
-          that saves contact form submissions to a JSON file.
+          My work spans data science (predictive models, prescriptive
+          analytics, Tableau dashboards) and software development (CLI tools,
+          REST APIs). This portfolio itself is an example: it uses Next.js
+          dynamic routes for projects and a Server Action that saves contact
+          form submissions to a JSON file.
         </p>
       </section>
       <section className="card">
@@ -48,8 +49,8 @@ export default function AboutPage() {
         <h2>Education</h2>
         <p>
           <strong>Santa Clara University</strong> — Information Systems,
-          coursework in full-stack web development, databases, and cloud
-          computing.
+          coursework in full-stack web development, databases, and data
+          analytics.
         </p>
       </section>
     </main>

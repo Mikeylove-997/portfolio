@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Your Name | Portfolio",
-    template: "%s | Your Name Portfolio",
+    default: "Mike Zhao | Portfolio",
+    template: "%s | Mike Zhao Portfolio",
   },
   description:
     "Portfolio built with Next.js — about me, dynamically routed projects, and a server-side contact form.",
@@ -36,7 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <header className="site-header">
           <nav className="container nav">
             <Link href="/" className="brand">
-              {"Your Name"}
+              {"Mike Zhao"}
             </Link>
             <ul className="nav-links">
               {navLinks.map((link) => (

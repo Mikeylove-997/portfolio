@@ -6,7 +6,7 @@ export default function Home() {
     <main className="container page hero">
       <p className="eyebrow">Welcome to my portfolio</p>
       <h1>
-        Hi, I&apos;m <span className="accent">Your Name</span>
+        Hi, I&apos;m <span className="accent">Mike Zhao</span>
       </h1>
       <p className="lead">
         I build web applications with Next.js — clean interfaces on the
