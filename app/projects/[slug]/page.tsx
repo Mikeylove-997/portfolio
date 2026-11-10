@@ -37,14 +37,26 @@ export default async function ProjectPage(
       </Link>
       <h1>{project.title}</h1>
       <p className="lead">{project.description}</p>
-      <a
-        href={project.repoUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="btn secondary"
-      >
-        View Source on GitHub
-      </a>
+      <div className="cta-row">
+        {project.liveUrl ? (
+          <a
+            href={project.liveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn primary"
+          >
+            View Live App
+          </a>
+        ) : null}
+        <a
+          href={project.repoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn secondary"
+        >
+          View Source on GitHub
+        </a>
+      </div>
 
       <section className="card">
         <h2>Tech Stack</h2>

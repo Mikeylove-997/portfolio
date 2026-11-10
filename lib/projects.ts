@@ -5,6 +5,7 @@ export type Project = {
   techStack: string[];
   features: string[];
   repoUrl: string;
+  liveUrl?: string;
 };
 
 export const projects: Project[] = [
@@ -23,18 +24,19 @@ export const projects: Project[] = [
     repoUrl: "https://github.com/Mikeylove-997/payactiv-ewa-api",
   },
   {
-    slug: "inventory-cli",
-    title: "Store Inventory CLI",
+    slug: "company-brain",
+    title: "Financial Company Brain",
     description:
-      "A Python 3 command-line application for managing a small store's product inventory, with JSON persistence and robust input validation (ISBA 2438 Assignment 1).",
-    techStack: ["Python", "argparse", "JSON"],
+      "A Streamlit analytics app that explains why profit missed budget in seconds: Python does the variance math, HydraDB retrieves the reasons from company documents, and every claim cites its source. When no document explains a number, it says so.",
+    techStack: ["Python", "Streamlit", "HydraDB", "LLM"],
     features: [
-      "Add, list, get, update, and delete products from the command line",
-      "Low-stock report with configurable reorder thresholds",
-      "All data persisted to a local JSON file with schema validation",
-      "Strict input validation for names, prices, quantities, and IDs",
+      "Driver-by-driver breakdown of budget-vs-actual misses with evidence ratings",
+      "Retrieves and cites the exact document sections behind each claim",
+      "Guardrails flag insufficient evidence and list every correction made to the answer",
+      "Deployed live on Streamlit Cloud, with a CLI and test suite",
     ],
-    repoUrl: "https://github.com/Mikeylove-997/inventory-cli",
+    repoUrl: "https://github.com/Mikeylove-997/Company-brain",
+    liveUrl: "https://ridgeline-company-brain.streamlit.app/",
   },
 ];
 
