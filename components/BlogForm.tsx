@@ -25,11 +25,12 @@ export default function BlogForm() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     setSending(true);
     setFailed(false);
     setDuplicateMessage(null);
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
     const payload = {
       title: String(formData.get("title") ?? ""),
       content: String(formData.get("content") ?? ""),
@@ -46,7 +47,7 @@ export default function BlogForm() {
         const post: CreatedPost = await response.json();
         setCreated(post);
         setFieldErrors({});
-        event.currentTarget.reset();
+        form.reset();
       } else if (response.status === 400) {
         const data = await response.json();
         setCreated(null);

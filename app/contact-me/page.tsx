@@ -16,10 +16,11 @@ export default function ContactApiPage() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     setSending(true);
     setFailed(false);
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
     const payload = {
       name: String(formData.get("name") ?? ""),
       email: String(formData.get("email") ?? ""),
@@ -36,7 +37,7 @@ export default function ContactApiPage() {
       if (response.status === 201) {
         setErrors({});
         setSubmitted(true);
-        event.currentTarget.reset();
+        form.reset();
       } else if (response.status === 400) {
         const data = await response.json();
         setErrors(data.errors ?? {});
