@@ -12,12 +12,5 @@
     "title": "From Python Notebook to Production API",
     "content": "Turning my Payactiv practicum work into a deployed service taught me the difference between a model that works and a model that serves. Pickled scikit-learn estimators became a documented REST API with a Procfile for cloud deployment, and an MCP server lets AI tools call the predictions directly.",
     "createdAt": "2026-11-08T14:30:00.000Z"
-  },
-  {
-    "id": "6da9d30d-4956-41ca-8c0f-a345039c5432",
-    "slug": "blog-test-from-curl",
-    "title": "Blog Test From Curl",
-    "content": "temporary post used to verify the endpoint",
-    "createdAt": "2026-11-12T05:50:41.738Z"
   }
 ]
