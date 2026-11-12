@@ -1,20 +1,20 @@
 [
   {
-    "id": "f7c35db4-43eb-4c86-9611-892bdc4a153d",
-    "name": "mike zhao",
+    "id": "3f2a9c1e-5d84-4b6f-9a2e-7c1d0e8b4a55",
+    "name": "Jane Porter",
     "email": "jane@example.com",
-    "message": "Hello",
+    "message": "Hi Mike, I found your Financial Company Brain project through the blog post — impressive evidence handling. Could I ask you a few questions about the stack?",
     "project": null,
-    "source": "server-action",
-    "submittedAt": "2026-11-10T07:45:37.204Z"
+    "source": "api",
+    "submittedAt": "2026-11-12T08:15:00.000Z"
   },
   {
-    "id": "5f3133ef-7642-43e3-bbad-7ec7e5826d7b",
-    "name": "dsadas",
+    "id": "8d47b6f0-2e93-4c5a-8f1b-6a9e3d7c2b04",
+    "name": "Alex Kim",
     "email": "alex@example.com",
-    "message": "dasdas",
-    "project": null,
+    "message": "Great portfolio! I'd love to hear more about how you deployed the EWA prediction API and what you learned from the practicum.",
+    "project": "company-brain",
     "source": "server-action",
-    "submittedAt": "2026-11-12T02:57:58.852Z"
+    "submittedAt": "2026-11-12T09:40:00.000Z"
   }
 ]
