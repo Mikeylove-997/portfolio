@@ -391,3 +391,14 @@ h2 {
 .admin-table .message-cell {
   max-width: 280px;
 }
+
+.post-date {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.post-content p {
+  margin-bottom: 1.1rem;
+  line-height: 1.7;
+  max-width: 65ch;
+}

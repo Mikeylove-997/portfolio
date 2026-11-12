@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { readContacts } from "@/lib/contacts";
@@ -21,6 +22,11 @@ export default function AdminPage() {
       <Suspense fallback={<p className="lead">Loading submissions...</p>}>
         <SubmissionsTable />
       </Suspense>
+      <div className="cta-row">
+        <Link href="/admin/blogs" className="btn secondary">
+          Manage Blog Posts →
+        </Link>
+      </div>
     </main>
   );
 }
