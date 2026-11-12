@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import ContactForm from "@/components/contact-form";
-import FormBanner from "@/components/form-banner";
 import { getProjectBySlug, projects } from "@/lib/projects";
 
 export function generateStaticParams() {
@@ -84,9 +82,6 @@ export default async function ProjectPage(
           Interested in something similar? Send me a message — it will be
           tagged with this project.
         </p>
-        <Suspense fallback={null}>
-          <FormBanner searchParams={props.searchParams} />
-        </Suspense>
         <ContactForm projectSlug={project.slug} />
       </section>
     </main>

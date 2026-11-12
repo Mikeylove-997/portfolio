@@ -1,11 +1,21 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { getProjectBySlug } from "@/lib/projects";
 import { validateContact } from "@/lib/validation";
+import type { ContactFieldErrors } from "@/lib/validation";
 import { addContact } from "@/lib/contacts";
 
-export async function saveContactMessage(formData: FormData) {
+export type ContactFormState = {
+  status: "idle" | "success" | "error";
+  errors: ContactFieldErrors;
+  values: { name: string; email: string; message: string };
+  savedId: string | null;
+};
+
+export async function saveContactMessage(
+  prevState: ContactFormState,
+  formData: FormData
+): Promise<ContactFormState> {
   const name = String(formData.get("name") ?? "");
   const email = String(formData.get("email") ?? "");
   const message = String(formData.get("message") ?? "");
@@ -14,20 +24,27 @@ export async function saveContactMessage(formData: FormData) {
   const project =
     projectParam && getProjectBySlug(projectParam) ? projectParam : null;
 
-  const { valid } = validateContact({ name, email, message });
+  const { valid, errors } = validateContact({ name, email, message });
   if (!valid) {
-    redirect("/contact-me-server-form?status=error");
+    return {
+      status: "error",
+      errors,
+      values: { name, email, message },
+      savedId: null,
+    };
   }
 
-  await addContact({
+  const saved = await addContact({
     name: name.trim(),
     email: email.trim(),
     message: message.trim(),
     project,
   });
 
-  if (project) {
-    redirect(`/projects/${project}?submitted=1`);
-  }
-  redirect("/contact-me-server-form?submitted=1");
+  return {
+    status: "success",
+    errors: {},
+    values: { name: "", email: "", message: "" },
+    savedId: saved.id,
+  };
 }

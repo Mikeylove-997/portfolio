@@ -17,12 +17,12 @@ A portfolio website for ISBA 2438 built with **Next.js (App Router)**, **TypeScr
 
 The whole flow runs on the server with **no client-side JavaScript required** (progressive enhancement):
 
-1. **Render** — `app/contact-me-server-form/page.tsx` is a **Server Component**. It renders the `<ContactForm />` component, passing the Server Action `saveContactMessage` (from `app/contact-me-server-form/actions.ts`, marked `"use server"`) to the form's `action` prop.
-2. **Submit** — When the visitor clicks "Send Message", the browser POSTs the form data. Next.js intercepts that POST and invokes the `saveContactMessage` Server Action on the server with the `FormData`.
-3. **Validate** — The action reads `name`, `email`, and `message` from the `FormData`, trims them, and validates that no field is empty and the email matches a basic pattern. Invalid input redirects back to the page with `?status=error`, which the page renders as an error banner.
-4. **Persist** — The action reads `data/submissions.json` from disk with `fs.readFile`, parses it into an array, appends a new submission object (`id` from `crypto.randomUUID()`, the field values, the optional `project` slug, and a `submittedAt` ISO timestamp), then writes the array back with `fs.writeFile`.
-5. **Redirect** — The action finishes with `redirect()`: back to `/contact-me-server-form?submitted=1` (or `/projects/<slug>?submitted=1` when the form was submitted from a project page).
-6. **Feedback** — The page re-renders; the `<FormBanner />` component (inside a `<Suspense>` boundary, because `searchParams` is a runtime API) reads `submitted` from the URL and shows the success message.
+1. **Render** — `app/contact-me-server-form/page.tsx` is a Server Component that renders the `<ContactForm />` client component. The form's `action` prop receives the Server Action `saveContactMessage` (from `app/contact-me-server-form/actions.ts`, marked `"use server"`) through React's `useActionState` hook, and `noValidate` disables browser validation so the server rules are what users see.
+2. **Submit** — Clicking "Send Message" POSTs the form; Next.js invokes the `saveContactMessage` Server Action on the server with the `FormData`.
+3. **Validate** — The action calls the shared `validateContact` from `lib/validation.ts`. On failure it *returns* state (per-field errors plus the submitted values) instead of redirecting — so the form shows inline error messages under each field and keeps what the user typed.
+4. **Persist** — On valid input the action calls the shared `addContact` from `lib/contacts.ts`, which appends to `data/submissions.json` (id, fields, optional project tag, timestamp).
+5. **Feedback** — The action returns success state with the saved id; the form shows the green banner and clears the fields. Because the banner comes from per-submission state (not the URL), it only appears for the submission that actually succeeded.
+6. **Shared path** — The same `validateContact` and `addContact` power the `POST /api/contact` endpoint used by `/contact-me`, so both forms validate identically and save to the same JSON file.
 
 Submitted data lives in [`data/submissions.json`](data/submissions.json).
 
