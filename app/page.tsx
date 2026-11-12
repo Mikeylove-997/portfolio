@@ -16,7 +16,7 @@ export default function Home() {
         <Link href="/projects" className="btn primary">
           View My Projects
         </Link>
-        <Link href="/contact-me-server-form" className="btn secondary">
+        <Link href="/contact-me" className="btn secondary">
           Contact Me
         </Link>
       </div>
@@ -34,11 +34,11 @@ export default function Home() {
           </p>
           <span className="view-link">Browse projects →</span>
         </Link>
-        <Link href="/contact-me-server-form" className="card">
+        <Link href="/contact-me" className="card">
           <h2>Contact</h2>
           <p>
-            A server-rendered form — submissions are saved to a JSON file via
-            a Server Action.
+            Two ways to reach me — a client-side API form and a Server Action
+            form — both saved to the same JSON file.
           </p>
           <span className="view-link">Say hello →</span>
         </Link>
