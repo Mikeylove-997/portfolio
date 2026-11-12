@@ -12,32 +12,19 @@ export default function BlogList() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let ignore = false;
-
     async function load() {
       try {
         const res = await fetch("/api/blogs", { cache: "no-store" });
         const data = await res.json();
-        if (!ignore) setPosts(data);
+        setPosts(data);
       } catch {
-        if (!ignore) setError("Could not load posts. Please refresh the page.");
+        setError("Could not load posts. Please refresh the page.");
       } finally {
-        if (!ignore) setLoading(false);
+        setLoading(false);
       }
     }
 
     load();
-
-    function refresh() {
-      load();
-    }
-
-    window.addEventListener("blog-created", refresh);
-
-    return () => {
-      ignore = true;
-      window.removeEventListener("blog-created", refresh);
-    };
   }, []);
 
   async function handleDelete(slug: string) {
