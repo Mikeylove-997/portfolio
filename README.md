@@ -8,6 +8,7 @@ A portfolio website for ISBA 2438 built with **Next.js (App Router)**, **TypeScr
 | --- | --- |
 | `/` | Landing page with hero and quick links |
 | `/about-me` | About Me — bio, skills, education |
+| `/contact-me` | Contact form that makes a client-side **API call** to `POST /api/contact` — shows per-field errors from the server |
 | `/contact-me-server-form` | Contact form handled by a **Server Action**; submissions are saved to `data/submissions.json` |
 | `/projects` | Lists all projects |
 | `/projects/[slug]` | **Dynamically routed** project detail pages — currently `/projects/task-manager-app` and `/projects/weather-dashboard`. Each project page also embeds a contact form tagged with that project's slug. |
