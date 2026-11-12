@@ -25,6 +25,29 @@ The whole flow runs on the server with **no client-side JavaScript required** (p
 
 Submitted data lives in [`data/submissions.json`](data/submissions.json).
 
+### Shared Validation and Storage (`lib/`)
+
+Both submission paths — the Server Action form and the API endpoint — share one validation and one storage implementation (no duplicate logic):
+
+- [`lib/validation.ts`](lib/validation.ts) — `validateContact({ name, email, message })` returns `{ valid, errors }` with per-field messages. Rules: name/message required after trimming; email must have exactly one `@`, non-empty local part, no whitespace, and a domain containing a dot with no empty labels.
+- [`lib/contacts.ts`](lib/contacts.ts) — `readContacts()` and `addContact()` read and append to `data/submissions.json`, creating it if missing.
+
+### API Endpoint: `POST /api/contact`
+
+A JSON API that saves to the same file:
+
+1. Parses the JSON request body.
+2. Validates it with `validateContact` — invalid requests get `400 { errors }` with per-field messages.
+3. Valid requests are saved with `addContact` and return `201 { success: true }`.
+
+Example:
+
+```bash
+curl -X POST http://localhost:3000/api/contact \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Mike","email":"mike@scu.edu","message":"Hello"}'
+```
+
 ## Getting Started
 
 ```bash
