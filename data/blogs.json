@@ -1,0 +1,23 @@
+[
+  {
+    "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+    "slug": "how-i-built-this-portfolio-with-nextjs",
+    "title": "How I Built This Portfolio with Next.js",
+    "content": "This portfolio runs on the Next.js App Router. Every route is a folder, the two project pages come from one dynamic [slug] template, and the contact forms share a single validation and storage layer in lib/. The server form uses a Server Action, while the API form posts to a route handler — and both write to the same JSON file.",
+    "createdAt": "2026-11-01T09:00:00.000Z"
+  },
+  {
+    "id": "b3df2c05-8f4a-4d2e-9c1f-5f6f8a9b0c2d",
+    "slug": "from-python-notebook-to-production-api",
+    "title": "From Python Notebook to Production API",
+    "content": "Turning my Payactiv practicum work into a deployed service taught me the difference between a model that works and a model that serves. Pickled scikit-learn estimators became a documented REST API with a Procfile for cloud deployment, and an MCP server lets AI tools call the predictions directly.",
+    "createdAt": "2026-11-08T14:30:00.000Z"
+  },
+  {
+    "id": "6da9d30d-4956-41ca-8c0f-a345039c5432",
+    "slug": "blog-test-from-curl",
+    "title": "Blog Test From Curl",
+    "content": "temporary post used to verify the endpoint",
+    "createdAt": "2026-11-12T05:50:41.738Z"
+  }
+]
