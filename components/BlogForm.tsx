@@ -48,6 +48,7 @@ export default function BlogForm() {
         setCreated(post);
         setFieldErrors({});
         form.reset();
+        window.dispatchEvent(new Event("blog-created"));
       } else if (response.status === 400) {
         const data = await response.json();
         setCreated(null);

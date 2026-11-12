@@ -76,3 +76,17 @@ export async function addBlog({
 
   return { ok: true, post };
 }
+
+export async function deleteBlog(slug: string): Promise<boolean> {
+  const blogs = await getAllBlogs();
+  const remaining = blogs.filter((post) => post.slug !== slug);
+
+  if (remaining.length === blogs.length) {
+    return false;
+  }
+
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.writeFile(DATA_FILE, JSON.stringify(remaining, null, 2), "utf8");
+
+  return true;
+}

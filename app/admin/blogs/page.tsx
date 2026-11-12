@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import BlogForm from "@/components/BlogForm";
+import BlogList from "@/components/BlogList";
 
 export const metadata: Metadata = {
   title: "Admin — Blog Posts",
@@ -20,6 +21,12 @@ export default function AdminBlogsPage() {
         generated from the title.
       </p>
       <BlogForm />
+      <h2>Existing Posts</h2>
+      <p className="lead">
+        Deleting a post removes it from <code>/blogs</code> immediately. You
+        will be asked to confirm first.
+      </p>
+      <BlogList />
     </main>
   );
 }
