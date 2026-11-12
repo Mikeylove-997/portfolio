@@ -1,12 +1,15 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
+export type ContactSource = "api" | "server-action";
+
 export type ContactSubmission = {
   id: string;
   name: string;
   email: string;
   message: string;
   project: string | null;
+  source: ContactSource | null;
   submittedAt: string;
 };
 
@@ -16,7 +19,14 @@ const DATA_FILE = path.join(DATA_DIR, "submissions.json");
 export async function readContacts(): Promise<ContactSubmission[]> {
   try {
     const parsed = JSON.parse(await fs.readFile(DATA_FILE, "utf8"));
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((entry) => ({
+      ...entry,
+      source:
+        entry.source === "api" || entry.source === "server-action"
+          ? entry.source
+          : null,
+    }));
   } catch {
     return [];
   }
@@ -31,6 +41,7 @@ export async function addContact(
     email: contact.email,
     message: contact.message,
     project: contact.project,
+    source: contact.source,
     submittedAt: new Date().toISOString(),
   };
 

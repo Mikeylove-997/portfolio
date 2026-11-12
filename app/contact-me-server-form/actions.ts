@@ -39,6 +39,7 @@ export async function saveContactMessage(
     email: email.trim(),
     message: message.trim(),
     project,
+    source: "server-action",
   });
 
   return {

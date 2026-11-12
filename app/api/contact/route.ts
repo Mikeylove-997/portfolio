@@ -32,6 +32,7 @@ export async function POST(request: Request) {
     email: input.email.trim(),
     message: input.message.trim(),
     project: null,
+    source: "api",
   });
 
   return NextResponse.json({ success: true }, { status: 201 });
