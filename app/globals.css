@@ -402,3 +402,25 @@ h2 {
   line-height: 1.7;
   max-width: 65ch;
 }
+
+.about-header {
+  flex-direction: row;
+  gap: 1.75rem;
+  align-items: flex-start;
+}
+
+.about-photo {
+  border-radius: 14px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+  .about-header {
+    flex-direction: column;
+  }
+  .about-photo {
+    width: 100%;
+    height: auto;
+  }
+}
