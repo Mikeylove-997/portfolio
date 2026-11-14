@@ -7,11 +7,15 @@ A portfolio website for ISBA 2438 built with **Next.js (App Router)**, **TypeScr
 | Route | Description |
 | --- | --- |
 | `/` | Landing page with hero and quick links |
-| `/about-me` | About Me — bio, skills, education |
+| `/about-me` | About Me — bio, skills, education, and photo |
 | `/contact-me` | Contact form that makes a client-side **API call** to `POST /api/contact` — shows per-field errors from the server |
 | `/contact-me-server-form` | Contact form handled by a **Server Action**; submissions are saved to `data/submissions.json` |
 | `/projects` | Lists all projects |
-| `/projects/[slug]` | **Dynamically routed** project detail pages — currently `/projects/task-manager-app` and `/projects/weather-dashboard`. Each project page also embeds a contact form tagged with that project's slug. |
+| `/projects/[slug]` | **Dynamically routed** project detail pages — currently `/projects/payactiv-ewa-api` and `/projects/company-brain`. Each project page also embeds a contact form tagged with that project's slug. |
+| `/blogs` | Blog index — lists every post from `data/blogs.json` |
+| `/blogs/[slug]` | **Dynamically routed** blog post pages; unknown slugs show a "Post not found" page |
+| `/admin` | Submissions viewer — table of everything saved by either contact form (newest first). Not linked in the nav. |
+| `/admin/blogs` | Blog manager — publish new posts via `POST /api/blogs` and **delete** existing ones |
 
 ## How the Contact Form Works (`/contact-me-server-form`)
 
@@ -48,6 +52,25 @@ curl -X POST http://localhost:3000/api/contact \
   -H "Content-Type: application/json" \
   -d '{"name":"Mike","email":"mike@scu.edu","message":"Hello"}'
 ```
+
+## Blog: Publishing and Deleting (`/admin/blogs`)
+
+The admin page manages posts end to end — create and delete — against the same `data/blogs.json` file that `/blogs` reads:
+
+- **Create** — `components/BlogForm.tsx` sends a JSON `POST /api/blogs` request. The server generates the slug from the title (`lib/blogs.ts` → `addBlog`), rejects duplicate slugs with `409`, and shows per-field errors (`400`) inline. New posts appear on `/blogs` immediately.
+- **Delete** — `components/BlogList.tsx` lists existing posts (title + date) below the form. Each row's Delete button asks `Delete this post?` with a browser confirm dialog, then calls `DELETE /api/blogs/[slug]`. On success (`204`) the row is removed and a "Post deleted." message appears; if the post was already gone the API returns `404` and the list shows an error instead. Unknown slugs never crash the page.
+
+The public blog pages and the create form are unchanged by the delete feature — it only adds a management UI on top of the same data file.
+
+### Blog API Endpoints
+
+| Endpoint | Purpose | Responses |
+| --- | --- | --- |
+| `GET /api/blogs` | List all posts | `200` JSON array |
+| `POST /api/blogs` | Create a post | `201` post, `400` validation errors, `409` duplicate slug |
+| `DELETE /api/blogs/[slug]` | Delete a post | `204` on success, `404` if the slug doesn't exist |
+
+Storage lives in [`lib/blogs.ts`](lib/blogs.ts) (`getAllBlogs`, `getBlogBySlug`, `addBlog`, `deleteBlog`) and [`data/blogs.json`](data/blogs.json).
 
 ## Getting Started
 
