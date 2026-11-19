@@ -153,9 +153,9 @@ export default function ChatWidget() {
               <div className="chat-bubble chat-intro">
                 <p>
                   Hi! I&apos;m Mike Zhao Assistant. I answer questions about
-                  Mike&apos;s background — experience, projects, skills,
-                  education, and working style — using only the Q&amp;A
-                  knowledge base on this site.
+                  Mike&apos;s background — his education, experience, skills,
+                  projects, and blog posts — using the content published on
+                  this site.
                 </p>
                 <p className="chat-source">
                   I&apos;m a rule-based matcher, not an AI model — short,
@@ -168,17 +168,17 @@ export default function ChatWidget() {
               <ChatMessage
                 message={{
                   role: "assistant",
-                  text: "Try asking: what do you study?",
+                  text: "Try one of these to start:",
                   source: null,
                   related: [
-                    { id: "starter-1", question: "What do you study?" },
+                    { id: "starter-1", question: "What's Mike's education?" },
                     {
                       id: "starter-2",
-                      question: "What kind of work have you done?",
+                      question: "Tell me about the Payactiv project",
                     },
                     {
                       id: "starter-3",
-                      question: "What is the Financial Company Brain project?",
+                      question: "What skills does Mike have?",
                     },
                   ],
                   timestamp: "starter",

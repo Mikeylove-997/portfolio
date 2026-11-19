@@ -120,11 +120,11 @@ A browsable knowledge base about my background, grouped by category (Experience,
 
 ## Mike Zhao Assistant (`/api/assistant`)
 
-A rule-based chat widget (no external AI service) that answers visitor questions from the Q&A knowledge base:
+A rule-based chat widget (no external AI service) that answers visitor questions from three sources on this site — background notes (`data/background.md`, section-per-topic), projects (`data/projects.json`), and blog posts (`data/blogs.json`):
 
-- **Widget** (`components/ChatWidget.tsx`) — floating button in the bottom-right corner on every public page (hidden on `/admin`). Matching happens in one function (`lib/assistant.ts` → `answerQuestion`): it tokenizes the question, drops filler words, and scores entries by keyword matches (multi-word keywords included) plus question-word overlap — designed to be swapped for an AI model later.
-- **Response** — the best entry's answer when its score clears a threshold (with `Based on: <question>` attribution), up to 2 related questions as clickable buttons, or a fallback pointing to the contact form.
-- **History** — the conversation is saved in the browser's LocalStorage under `mz-assistant-chat` (last 50 messages, survives refresh and navigation; broken/missing data starts an empty chat). Nothing is stored server-side.
+- **Widget** (`components/ChatWidget.tsx`) — floating button in the bottom-right corner on every public page (hidden on `/admin`). Matching happens in one function (`lib/assistant.ts` → `answerQuestion`): it tokenizes the question, drops filler words, and scores each source document — title matches (section titles, project titles and tech stack, blog titles) count more than matches in long text. Designed to be swapped for an AI model later.
+- **Response** — the best match's answer (background section content; project title + description; blog title + excerpt) when its score clears a threshold, with `Based on: <Type> — <label>` attribution (clickable when the source has a page), up to 2 related items as clickable buttons, or a fallback pointing to the contact form.
+- **History** — the conversation is saved in the browser's LocalStorage under `mz-assistant-chat` (last 50 messages, survives refresh and navigation; older messages without the newer source fields still render; broken/missing data starts an empty chat). Nothing is stored server-side.
 
 | Endpoint | Purpose | Responses |
 | --- | --- | --- |
