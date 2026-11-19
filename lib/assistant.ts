@@ -83,9 +83,9 @@ async function buildDocs(): Promise<Doc[]> {
         type: "background",
         id: toId(section.title),
         label: section.title,
-        link: null,
+        link: "/about-me",
       },
-      answer: section.content,
+      answer: excerpt(section.content),
       titleTokens: contentTokens(section.title),
       bodyTokens: contentTokens(section.content),
     });
