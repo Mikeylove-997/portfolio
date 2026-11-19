@@ -47,8 +47,88 @@ function tokenize(text: string): string[] {
     .filter(Boolean);
 }
 
+function normalizeWord(word: string): string {
+  if (word.length > 3 && word.endsWith("s") && !word.endsWith("ss") && !word.endsWith("us")) {
+    return word.slice(0, -1);
+  }
+  return word;
+}
+
 function contentTokens(text: string): Set<string> {
-  return new Set(tokenize(text).filter((word) => !STOP_WORDS.has(word)));
+  return new Set(
+    tokenize(text)
+      .filter((word) => !STOP_WORDS.has(word))
+      .filter((word) => word.length > 1)
+      .map(normalizeWord)
+  );
+}
+
+const SYNONYMS: Record<string, string> = {
+  study: "education",
+  studies: "education",
+  studied: "education",
+  studying: "education",
+  student: "education",
+  school: "education",
+  university: "education",
+  college: "education",
+  degree: "education",
+  master: "education",
+  masters: "education",
+  ms: "education",
+  msba: "education",
+  program: "education",
+  visa: "education",
+  status: "education",
+  authorization: "education",
+  permit: "education",
+  opt: "education",
+  job: "experience",
+  jobs: "experience",
+  worked: "experience",
+  working: "experience",
+  work: "experience",
+  career: "experience",
+  employment: "experience",
+  employer: "experience",
+  companies: "experience",
+  company: "experience",
+  bank: "experience",
+  banking: "experience",
+  retail: "experience",
+  tool: "skills",
+  tools: "skills",
+  tech: "skills",
+  technologies: "skills",
+  software: "skills",
+  languages: "skills",
+  language: "skills",
+  programming: "skills",
+  xgboost: "skills",
+  shap: "skills",
+  coding: "skills",
+  hobby: "goals",
+  hobbies: "goals",
+  passionate: "goals",
+  passion: "goals",
+  aspiring: "goals",
+  aspiration: "goals",
+  aspirations: "goals",
+  plan: "goals",
+  plans: "goals",
+  ai: "llm",
+  ml: "machine",
+};
+
+function expandSynonyms(words: Set<string>): Set<string> {
+  const expanded = new Set(words);
+  for (const word of words) {
+    const mapped = SYNONYMS[word];
+    if (mapped) {
+      expanded.add(normalizeWord(mapped));
+    }
+  }
+  return expanded;
 }
 
 function toId(title: string): string {
@@ -130,16 +210,38 @@ export async function answerQuestion(
   question: string
 ): Promise<AssistantAnswer> {
   const docs = await buildDocs();
-  const queryWords = contentTokens(question);
+  const queryWords = expandSynonyms(contentTokens(question));
+
+  if (docs.length === 0 || queryWords.size === 0) {
+    return {
+      answer: FALLBACK_ANSWER,
+      matched: false,
+      source: null,
+      related: [],
+    };
+  }
+
+  const documentFrequency = new Map<string, number>();
+  for (const word of queryWords) {
+    const df = docs.filter(
+      (doc) => doc.titleTokens.has(word) || doc.bodyTokens.has(word)
+    ).length;
+    if (df > 0) {
+      documentFrequency.set(word, df);
+    }
+  }
 
   const scored = docs
     .map((doc) => {
       let score = 0;
       for (const word of queryWords) {
+        const df = documentFrequency.get(word);
+        if (!df) continue;
+        const weight = 1 + Math.log(docs.length / df);
         if (doc.titleTokens.has(word)) {
-          score += TITLE_WORD_SCORE;
+          score += TITLE_WORD_SCORE * weight;
         } else if (doc.bodyTokens.has(word)) {
-          score += BODY_WORD_SCORE;
+          score += BODY_WORD_SCORE * weight;
         }
       }
       return { doc, score };
