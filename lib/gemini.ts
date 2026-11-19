@@ -16,6 +16,16 @@ export type GeminiResult = {
   usedSources: number[];
 } | null;
 
+function isTransientError(error: unknown): boolean {
+  const message = String((error as { message?: unknown })?.message ?? error);
+  return (
+    message.includes("503") ||
+    message.includes("UNAVAILABLE") ||
+    message.includes("overloaded") ||
+    message.includes("high demand")
+  );
+}
+
 export async function askGemini(
   question: string,
   context: ContextPiece[]
@@ -25,7 +35,7 @@ export async function askGemini(
     return null;
   }
 
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const model = process.env.GEMINI_MODEL || "gemini-3.6-flash";
   const ai = new GoogleGenAI({ apiKey });
 
   const contextText = context
@@ -37,54 +47,68 @@ export async function askGemini(
     )
     .join("\n\n");
 
-  try {
-    const response = await ai.models.generateContent({
-      model,
-      contents: `Context pieces:\n\n${contextText}\n\nVisitor question: ${question}`,
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            answer: { type: Type.STRING },
-            usedSources: {
-              type: Type.ARRAY,
-              items: { type: Type.INTEGER },
+  const deadline = Date.now() + TIMEOUT_MS;
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const remaining = deadline - Date.now();
+    if (remaining < 1_000) {
+      return null;
+    }
+
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: `Context pieces:\n\n${contextText}\n\nVisitor question: ${question}`,
+        config: {
+          systemInstruction: SYSTEM_INSTRUCTION,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              answer: { type: Type.STRING },
+              usedSources: {
+                type: Type.ARRAY,
+                items: { type: Type.INTEGER },
+              },
             },
+            required: ["answer", "usedSources"],
           },
-          required: ["answer", "usedSources"],
+          abortSignal: AbortSignal.timeout(remaining),
         },
-        abortSignal: AbortSignal.timeout(TIMEOUT_MS),
-      },
-    });
+      });
 
-    const text = response.text?.trim();
-    if (!text) {
-      return null;
+      const text = response.text?.trim();
+      if (!text) {
+        return null;
+      }
+
+      const parsed = JSON.parse(text) as {
+        answer?: unknown;
+        usedSources?: unknown;
+      };
+
+      if (typeof parsed.answer !== "string" || !parsed.answer.trim()) {
+        return null;
+      }
+
+      const usedSources = Array.isArray(parsed.usedSources)
+        ? parsed.usedSources.filter(
+            (item): item is number =>
+              typeof item === "number" &&
+              Number.isInteger(item) &&
+              item >= 1 &&
+              item <= context.length
+          )
+        : [];
+
+      return { answer: parsed.answer.trim(), usedSources };
+    } catch (error) {
+      if (!isTransientError(error) || attempt === 2) {
+        return null;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
-
-    const parsed = JSON.parse(text) as {
-      answer?: unknown;
-      usedSources?: unknown;
-    };
-
-    if (typeof parsed.answer !== "string" || !parsed.answer.trim()) {
-      return null;
-    }
-
-    const usedSources = Array.isArray(parsed.usedSources)
-      ? parsed.usedSources.filter(
-          (item): item is number =>
-            typeof item === "number" &&
-            Number.isInteger(item) &&
-            item >= 1 &&
-            item <= context.length
-        )
-      : [];
-
-    return { answer: parsed.answer.trim(), usedSources };
-  } catch {
-    return null;
   }
+
+  return null;
 }
