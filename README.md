@@ -118,6 +118,18 @@ A browsable knowledge base about my background, grouped by category (Experience,
 | `PUT /api/qa/[id]` | Update an entry | `200` updated, `400` field errors, `404` if missing |
 | `DELETE /api/qa/[id]` | Delete an entry | `204` on success, `404` if missing |
 
+## Mike Zhao Assistant (`/api/assistant`)
+
+A rule-based chat widget (no external AI service) that answers visitor questions from the Q&A knowledge base:
+
+- **Widget** (`components/ChatWidget.tsx`) — floating button in the bottom-right corner on every public page (hidden on `/admin`). Matching happens in one function (`lib/assistant.ts` → `answerQuestion`): it tokenizes the question, drops filler words, and scores entries by keyword matches (multi-word keywords included) plus question-word overlap — designed to be swapped for an AI model later.
+- **Response** — the best entry's answer when its score clears a threshold (with `Based on: <question>` attribution), up to 2 related questions as clickable buttons, or a fallback pointing to the contact form.
+- **History** — the conversation is saved in the browser's LocalStorage under `mz-assistant-chat` (last 50 messages, survives refresh and navigation; broken/missing data starts an empty chat). Nothing is stored server-side.
+
+| Endpoint | Purpose | Responses |
+| --- | --- | --- |
+| `POST /api/assistant` | Ask a question (`{ question: string }`, max 300 chars) | `200` `{ answer, matched, source, related }`, `400` invalid input |
+
 ## Getting Started
 
 ```bash

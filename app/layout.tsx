@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
+import ChatWidget from "@/components/ChatWidget";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -51,6 +53,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </nav>
         </header>
         {children}
+        <Suspense fallback={null}>
+          <ChatWidget />
+        </Suspense>
         <footer className="site-footer">
           <div className="container">
             <p>
