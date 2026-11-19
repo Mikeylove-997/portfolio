@@ -21,8 +21,10 @@ export async function saveContactMessage(
   const message = String(formData.get("message") ?? "");
   const projectParam = String(formData.get("project") ?? "").trim();
 
-  const project =
-    projectParam && getProjectBySlug(projectParam) ? projectParam : null;
+  const projectExists = projectParam
+    ? Boolean(await getProjectBySlug(projectParam))
+    : false;
+  const project = projectParam && projectExists ? projectParam : null;
 
   const { valid, errors } = validateContact({ name, email, message });
   if (!valid) {

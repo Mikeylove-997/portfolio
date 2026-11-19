@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { projects } from "@/lib/projects";
+import { headers } from "next/headers";
+import { Suspense } from "react";
 
 export default function Home() {
   return (
@@ -28,10 +29,9 @@ export default function Home() {
         </Link>
         <Link href="/projects" className="card">
           <h2>Projects</h2>
-          <p>
-            {projects.length} featured builds, each with its own dynamically
-            routed page.
-          </p>
+          <Suspense fallback={<p>Loading projects...</p>}>
+            <ProjectCount />
+          </Suspense>
           <span className="view-link">Browse projects →</span>
         </Link>
         <Link href="/contact-me" className="card">
@@ -44,5 +44,25 @@ export default function Home() {
         </Link>
       </div>
     </main>
+  );
+}
+
+async function ProjectCount() {
+  const headerList = await headers();
+  const host = headerList.get("host") ?? "localhost:3000";
+  const protocol = host.startsWith("localhost") || host.startsWith("127.")
+    ? "http"
+    : "https";
+
+  const response = await fetch(`${protocol}://${host}/api/projects`, {
+    cache: "no-store",
+  });
+  const projects: unknown[] = response.ok ? await response.json() : [];
+
+  return (
+    <p>
+      {projects.length} featured build{projects.length === 1 ? "" : "s"}, each
+      with its own dynamically routed page.
+    </p>
   );
 }

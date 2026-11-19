@@ -1,35 +1,44 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
+import { Suspense } from "react";
 import ContactForm from "@/components/contact-form";
-import { getProjectBySlug, projects } from "@/lib/projects";
 
-export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
+export default function ProjectPage(props: PageProps<"/projects/[slug]">) {
+  return (
+    <main className="container page">
+      <Suspense fallback={<p className="lead">Loading project...</p>}>
+        <ProjectContent params={props.params} />
+      </Suspense>
+    </main>
+  );
 }
 
-export async function generateMetadata(
-  props: PageProps<"/projects/[slug]">
-): Promise<Metadata> {
-  const { slug } = await props.params;
-  const project = getProjectBySlug(slug);
-  if (!project) {
-    return { title: "Project Not Found" };
-  }
-  return { title: project.title, description: project.description };
-}
+async function ProjectContent({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
 
-export default async function ProjectPage(
-  props: PageProps<"/projects/[slug]">
-) {
-  const { slug } = await props.params;
-  const project = getProjectBySlug(slug);
+  const headerList = await headers();
+  const host = headerList.get("host") ?? "localhost:3000";
+  const protocol = host.startsWith("localhost") || host.startsWith("127.")
+    ? "http"
+    : "https";
+
+  const response = await fetch(
+    `${protocol}://${host}/api/projects/${slug}`,
+    { cache: "no-store" }
+  );
+  const project: Project | null = response.ok ? await response.json() : null;
+
   if (!project) {
     notFound();
   }
 
   return (
-    <main className="container page">
+    <article>
       <Link href="/projects" className="back-link">
         ← All Projects
       </Link>
@@ -84,6 +93,16 @@ export default async function ProjectPage(
         </p>
         <ContactForm projectSlug={project.slug} />
       </section>
-    </main>
+    </article>
   );
 }
+
+type Project = {
+  slug: string;
+  title: string;
+  description: string;
+  techStack: string[];
+  features: string[];
+  repoUrl: string;
+  liveUrl?: string;
+};

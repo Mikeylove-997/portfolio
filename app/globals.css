@@ -358,6 +358,16 @@ h2 {
   color: #fff;
 }
 
+.row-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.admin-list-heading {
+  margin-top: 2rem;
+}
+
 .form button {
   align-self: flex-start;
   cursor: pointer;

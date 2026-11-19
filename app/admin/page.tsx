@@ -26,6 +26,9 @@ export default function AdminPage() {
         <Link href="/admin/blogs" className="btn secondary">
           Manage Blog Posts →
         </Link>
+        <Link href="/admin/projects" className="btn secondary">
+          Manage Projects →
+        </Link>
       </div>
     </main>
   );

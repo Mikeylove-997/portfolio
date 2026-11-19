@@ -14,8 +14,9 @@ A portfolio website for ISBA 2438 built with **Next.js (App Router)**, **TypeScr
 | `/projects/[slug]` | **Dynamically routed** project detail pages — currently `/projects/payactiv-ewa-api` and `/projects/company-brain`. Each project page also embeds a contact form tagged with that project's slug. |
 | `/blogs` | Blog index — lists every post from `data/blogs.json` |
 | `/blogs/[slug]` | **Dynamically routed** blog post pages; unknown slugs show a "Post not found" page |
-| `/admin` | Submissions viewer — table of everything saved by either contact form (newest first). Not linked in the nav. |
+| `/admin` | Submissions viewer — table of everything saved by both contact forms (newest first). Not linked in the nav. |
 | `/admin/blogs` | Blog manager — publish new posts via `POST /api/blogs` and **delete** existing ones |
+| `/admin/projects` | Project manager — **create, edit, and delete** projects via the projects API |
 
 ## How the Contact Form Works (`/contact-me-server-form`)
 
@@ -71,6 +72,23 @@ The public blog pages and the create form are unchanged by the delete feature �
 | `DELETE /api/blogs/[slug]` | Delete a post | `204` on success, `404` if the slug doesn't exist |
 
 Storage lives in [`lib/blogs.ts`](lib/blogs.ts) (`getAllBlogs`, `getBlogBySlug`, `addBlog`, `deleteBlog`) and [`data/blogs.json`](data/blogs.json).
+
+## Projects: Full CRUD (`data/projects.json`)
+
+Projects are no longer hardcoded — they live in [`data/projects.json`](data/projects.json) and are served through the API:
+
+- **Public pages** (`/projects`, `/projects/[slug]`, and the home page project count) fetch from `GET /api/projects` at request time — the same live-fetch pattern as `/blogs`.
+- **Admin** (`/admin/projects`) lists every project with Edit/Delete buttons. The same form handles create (`POST`) and edit (`PUT`), pre-filled when editing; tech stack and features are entered one per line. Deleting asks for confirmation first.
+- **Slugs** are generated from the title on create and kept on update, so existing links never break.
+- **Validation** (server-side, `lib/projects.ts`): title, description, and repo URL are required; repo and live URLs must be valid http(s) URLs; tech stack and features must each contain at least one non-empty entry. Invalid input returns `400` with field-level errors.
+
+| Endpoint | Purpose | Responses |
+| --- | --- | --- |
+| `GET /api/projects` | List all projects | `200` JSON array |
+| `POST /api/projects` | Create a project | `201` project, `400` field errors, `409` duplicate slug |
+| `GET /api/projects/[slug]` | Fetch one project | `200` project, `404` if missing |
+| `PUT /api/projects/[slug]` | Update a project | `200` updated, `400` field errors, `404` if missing |
+| `DELETE /api/projects/[slug]` | Delete a project | `204` on success, `404` if missing |
 
 ## Getting Started
 
