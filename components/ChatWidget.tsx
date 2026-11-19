@@ -149,11 +149,42 @@ export default function ChatWidget() {
             </div>
           </div>
           <div className="chat-messages" ref={listRef}>
+            <div className="chat-message assistant">
+              <div className="chat-bubble chat-intro">
+                <p>
+                  Hi! I&apos;m Mike Zhao Assistant. I answer questions about
+                  Mike&apos;s background — experience, projects, skills,
+                  education, and working style — using only the Q&amp;A
+                  knowledge base on this site.
+                </p>
+                <p className="chat-source">
+                  I&apos;m a rule-based matcher, not an AI model — short,
+                  on-topic questions work best. Pick a suggestion below or ask
+                  your own.
+                </p>
+              </div>
+            </div>
             {messages.length === 0 ? (
-              <p className="chat-note">
-                Hi! Ask me anything about Mike&apos;s experience, projects,
-                skills, or education.
-              </p>
+              <ChatMessage
+                message={{
+                  role: "assistant",
+                  text: "Try asking: what do you study?",
+                  source: null,
+                  related: [
+                    { id: "starter-1", question: "What do you study?" },
+                    {
+                      id: "starter-2",
+                      question: "What kind of work have you done?",
+                    },
+                    {
+                      id: "starter-3",
+                      question: "What is the Financial Company Brain project?",
+                    },
+                  ],
+                  timestamp: "starter",
+                }}
+                onAskRelated={ask}
+              />
             ) : (
               messages.map((message, index) => (
                 <ChatMessage
