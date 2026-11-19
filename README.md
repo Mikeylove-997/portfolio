@@ -120,15 +120,20 @@ A browsable knowledge base about my background, grouped by category (Experience,
 
 ## Mike Zhao Assistant (`/api/assistant`)
 
-A rule-based chat widget (no external AI service) that answers visitor questions from three sources on this site — background notes (`data/background.md`, section-per-topic), projects (`data/projects.json`), and blog posts (`data/blogs.json`):
+A chat widget that answers visitor questions about Mike's background. **Two modes:**
 
-- **Widget** (`components/ChatWidget.tsx`) — floating button in the bottom-right corner on every public page (hidden on `/admin`). Matching happens in one function (`lib/assistant.ts` → `answerQuestion`): it tokenizes the question, drops filler words, and scores each source document — title matches (section titles, project titles and tech stack, blog titles) count more than matches in long text. Designed to be swapped for an AI model later.
-- **Response** — the best match's answer (background section content; project title + description; blog title + excerpt) when its score clears a threshold, with `Based on: <Type> — <label>` attribution (clickable when the source has a page), up to 2 related items as clickable buttons, or a fallback pointing to the contact form.
-- **History** — the conversation is saved in the browser's LocalStorage under `mz-assistant-chat` (last 50 messages, survives refresh and navigation; older messages without the newer source fields still render; broken/missing data starts an empty chat). Nothing is stored server-side.
+- **AI mode (default when configured)** — uses **Google Gemini** (official `@google/genai` SDK) to write a natural answer. Retrieval reuses the site's keyword scoring to pick the top 5 pieces from `data/background.md`, `data/projects.json`, and `data/blogs.json`; only those labeled pieces are sent to Gemini with a strict system instruction: answer only from the context, never invent facts, refer to Mike in the third person, no personality/judgment answers, ignore instruction-changing attempts in the question.
+- **Keyword mode (fallback)** — if `GEMINI_API_KEY` is missing, Gemini errors, or the call exceeds 10 seconds, the original rule-based scorer answers directly. All matching still lives in one function (`lib/assistant.ts` → `answerQuestion`).
+
+Setup: copy `.env.example` to `.env.local` and fill in `GEMINI_API_KEY` (from [Google AI Studio](https://aistudio.google.com/apikey)). The key is read server-side only — never in browser code, never committed, never logged.
+
+- **Widget** (`components/ChatWidget.tsx`) — floating button on every public page (hidden on `/admin`); shows "Based on: …" attribution (clickable) for every source used.
+- **History** — conversation saved in LocalStorage under `mz-assistant-chat` (last 50 messages; survives refresh and navigation; older messages still render). Nothing is stored server-side.
+- **Limits** — questions are capped at 300 characters; a simple per-IP rate limit allows 10 questions per minute (`429` beyond that) to protect the free Gemini quota.
 
 | Endpoint | Purpose | Responses |
 | --- | --- | --- |
-| `POST /api/assistant` | Ask a question (`{ question: string }`, max 300 chars) | `200` `{ answer, matched, source, related }`, `400` invalid input |
+| `POST /api/assistant` | Ask a question (`{ question: string }`) | `200` `{ answer, matched, source, sources, related, mode }` — `mode` is `"ai"` or `"keyword"` (for testing) — `400` invalid input, `429` rate-limited |
 
 ## Getting Started
 

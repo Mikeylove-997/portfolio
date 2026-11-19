@@ -27,6 +27,10 @@ function parseStored(raw: string | null): ChatStoredMessage[] {
         role: item.role,
         text: item.text,
         source: item.source ?? null,
+        sources:
+          Array.isArray(item.sources) && item.sources.length > 0
+            ? item.sources
+            : undefined,
         related: Array.isArray(item.related) ? item.related : [],
         timestamp:
           typeof item.timestamp === "string"
@@ -91,6 +95,7 @@ export default function ChatWidget() {
             role: "assistant" as const,
             text: data.answer,
             source: data.source ?? null,
+            sources: Array.isArray(data.sources) ? data.sources : undefined,
             related: Array.isArray(data.related) ? data.related : [],
             timestamp: new Date().toISOString(),
           }))

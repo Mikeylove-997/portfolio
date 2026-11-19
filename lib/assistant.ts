@@ -144,6 +144,7 @@ function excerpt(text: string): string {
 type Doc = {
   source: AssistantSource;
   answer: string;
+  context: string;
   titleTokens: Set<string>;
   bodyTokens: Set<string>;
 };
@@ -166,6 +167,7 @@ async function buildDocs(): Promise<Doc[]> {
         link: "/about-me",
       },
       answer: excerpt(section.content),
+      context: section.content,
       titleTokens: contentTokens(section.title),
       bodyTokens: contentTokens(section.content),
     });
@@ -180,6 +182,12 @@ async function buildDocs(): Promise<Doc[]> {
         link: `/projects/${project.slug}`,
       },
       answer: `${project.title} — ${project.description}`,
+      context: [
+        `Title: ${project.title}`,
+        `Description: ${project.description}`,
+        `Tech stack: ${project.techStack.join(", ")}`,
+        `Features: ${project.features.join("; ")}`,
+      ].join("\n"),
       titleTokens: contentTokens(
         [project.title, ...project.techStack].join(" ")
       ),
@@ -198,6 +206,7 @@ async function buildDocs(): Promise<Doc[]> {
         link: `/blogs/${post.slug}`,
       },
       answer: `${post.title}: ${excerpt(post.content)}`,
+      context: `Title: ${post.title}\nContent: ${post.content}`,
       titleTokens: contentTokens(post.title),
       bodyTokens: contentTokens(post.content),
     });
@@ -206,19 +215,19 @@ async function buildDocs(): Promise<Doc[]> {
   return docs;
 }
 
-export async function answerQuestion(
+export type ContextPiece = {
+  source: AssistantSource;
+  content: string;
+};
+
+async function rankDocs(
   question: string
-): Promise<AssistantAnswer> {
+): Promise<{ doc: Doc; score: number }[]> {
   const docs = await buildDocs();
   const queryWords = expandSynonyms(contentTokens(question));
 
   if (docs.length === 0 || queryWords.size === 0) {
-    return {
-      answer: FALLBACK_ANSWER,
-      matched: false,
-      source: null,
-      related: [],
-    };
+    return [];
   }
 
   const documentFrequency = new Map<string, number>();
@@ -231,7 +240,7 @@ export async function answerQuestion(
     }
   }
 
-  const scored = docs
+  return docs
     .map((doc) => {
       let score = 0;
       for (const word of queryWords) {
@@ -248,6 +257,23 @@ export async function answerQuestion(
     })
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score);
+}
+
+export async function retrieveContext(
+  question: string,
+  count: number
+): Promise<ContextPiece[]> {
+  const scored = await rankDocs(question);
+  return scored.slice(0, count).map(({ doc }) => ({
+    source: doc.source,
+    content: doc.context,
+  }));
+}
+
+export async function answerQuestion(
+  question: string
+): Promise<AssistantAnswer> {
+  const scored = await rankDocs(question);
 
   const toSource = (item: { doc: Doc; score: number }) => item.doc.source;
 

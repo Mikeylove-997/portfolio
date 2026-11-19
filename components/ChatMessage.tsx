@@ -10,9 +10,28 @@ export type ChatStoredMessage = {
   role: "user" | "assistant";
   text: string;
   source: AssistantSourceRef | null;
+  sources?: AssistantSourceRef[];
   related: AssistantSourceRef[];
   timestamp: string;
 };
+
+function SourceLine({ source }: { source: AssistantSourceRef }) {
+  const label = source.label ?? source.question ?? "";
+  const prefix = source.type
+    ? `${source.type.charAt(0).toUpperCase()}${source.type.slice(1)} — `
+    : "";
+  return source.link ? (
+    <a href={source.link} target="_blank" rel="noopener noreferrer">
+      {prefix}
+      {label}
+    </a>
+  ) : (
+    <>
+      {prefix}
+      {label}
+    </>
+  );
+}
 
 export default function ChatMessage({
   message,
@@ -22,11 +41,11 @@ export default function ChatMessage({
   onAskRelated: (question: string) => void;
 }) {
   const isUser = message.role === "user";
-  const source = message.source;
-  const sourceLabel = source?.label ?? source?.question ?? null;
-  const sourcePrefix = source?.type
-    ? `${source.type.charAt(0).toUpperCase()}${source.type.slice(1)} — `
-    : "";
+  const sources = message.sources?.length
+    ? message.sources
+    : message.source
+      ? [message.source]
+      : [];
 
   return (
     <div className={`chat-message ${isUser ? "user" : "assistant"}`}>
@@ -36,24 +55,19 @@ export default function ChatMessage({
         ) : (
           <>
             <p>{message.text}</p>
-            {source && sourceLabel ? (
+            {sources.length > 0 ? (
               <p className="chat-source">
                 Based on:{" "}
-                {source.link ? (
-                  <a
-                    href={source.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                {sources.map((source, index) => (
+                  <span
+                    key={
+                      source.id ?? source.label ?? source.question ?? index
+                    }
                   >
-                    {sourcePrefix}
-                    {sourceLabel}
-                  </a>
-                ) : (
-                  <>
-                    {sourcePrefix}
-                    {sourceLabel}
-                  </>
-                )}
+                    {index > 0 ? " · " : ""}
+                    <SourceLine source={source} />
+                  </span>
+                ))}
               </p>
             ) : null}
             {!isUser && message.related.length > 0 ? (
