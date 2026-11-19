@@ -29,6 +29,9 @@ export default function AdminPage() {
         <Link href="/admin/qa" className="btn secondary">
           Manage Q&A →
         </Link>
+        <Link href="/admin/assistant-log" className="btn secondary">
+          Assistant Log →
+        </Link>
       </div>
     </main>
   );

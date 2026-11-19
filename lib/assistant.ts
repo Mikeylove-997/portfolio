@@ -258,31 +258,16 @@ async function rankDocs(
     .sort((a, b) => b.score - a.score);
 }
 
-async function defaultContext(): Promise<ContextPiece[]> {
-  const sections = await getBackgroundSections();
-  const wanted = sections.filter(
-    (section) => /^summary$/i.test(section.title) || /^skills$/i.test(section.title)
-  );
-  return wanted.map((section) => ({
-    source: {
-      type: "background" as const,
-      id: `background-${section.title.toLowerCase().replace(/\s+/g, "-")}`,
-      label: section.title,
-      link: "/about-me",
-    },
-    content: section.content,
-  }));
+export async function getAllPieces(): Promise<ContextPiece[]> {
+  const docs = await buildDocs();
+  return docs.map(({ source, context }) => ({ source, content: context }));
 }
 
-export async function retrieveContext(
+export async function getTopPieces(
   question: string,
   count: number
 ): Promise<ContextPiece[]> {
   const scored = await rankDocs(question);
-  const best = scored[0];
-  if (!best || best.score <= 0) {
-    return defaultContext();
-  }
   return scored.slice(0, count).map(({ doc }) => ({
     source: doc.source,
     content: doc.context,

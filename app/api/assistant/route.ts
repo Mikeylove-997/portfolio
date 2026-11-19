@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { connection } from "next/server";
-import { answerQuestion, retrieveContext } from "@/lib/assistant";
+import { answerQuestion, getAllPieces, getTopPieces } from "@/lib/assistant";
+import type { ContextPiece } from "@/lib/assistant";
 import { askGemini } from "@/lib/gemini";
+import { logAssistantEntry } from "@/lib/assistantLog";
 
 const QUESTION_MAX_LENGTH = 300;
 const RATE_LIMIT = 10;
 const RATE_WINDOW_MS = 60_000;
+const CONTEXT_CHAR_LIMIT = 60_000;
 
 const attempts = new Map<string, { count: number; resetAt: number }>();
 
@@ -31,6 +34,13 @@ function clientIp(request: Request): string {
     return forwarded.split(",")[0].trim();
   }
   return request.headers.get("x-real-ip") ?? "unknown";
+}
+
+function totalChars(pieces: ContextPiece[]): number {
+  return pieces.reduce(
+    (total, piece) => total + piece.content.length + piece.source.label.length,
+    0
+  );
 }
 
 export async function POST(request: Request) {
@@ -71,7 +81,17 @@ export async function POST(request: Request) {
   await connection();
 
   const trimmed = question.trim();
-  const context = await retrieveContext(trimmed, 5);
+
+  const allPieces = await getAllPieces();
+  let context: ContextPiece[];
+  if (totalChars(allPieces) > CONTEXT_CHAR_LIMIT) {
+    context = await getTopPieces(trimmed, 10);
+  } else {
+    context = allPieces;
+  }
+
+  let payload: Record<string, unknown>;
+  let loggedSources: string[];
 
   const geminiResult = context.length > 0 ? await askGemini(trimmed, context) : null;
 
@@ -79,24 +99,37 @@ export async function POST(request: Request) {
     const usedSources = context
       .filter((_, index) => geminiResult.usedSources.includes(index + 1))
       .map((piece) => piece.source);
-    const unusedSources = context
-      .map((piece) => piece.source)
-      .filter((source) => !usedSources.includes(source));
 
-    return NextResponse.json({
+    payload = {
       answer: geminiResult.answer,
       matched: usedSources.length > 0,
       source: usedSources[0] ?? null,
       sources: usedSources,
-      related: usedSources.length > 0 ? unusedSources.slice(0, 2) : [],
+      related: [],
       mode: "ai",
-    });
+    };
+    loggedSources = usedSources.map((source) => source.label);
+  } else {
+    const keyword = await answerQuestion(trimmed);
+    payload = {
+      ...keyword,
+      sources: keyword.source ? [keyword.source] : [],
+      mode: "keyword",
+    };
+    loggedSources = keyword.source ? [keyword.source.label] : [];
   }
 
-  const keyword = await answerQuestion(trimmed);
-  return NextResponse.json({
-    ...keyword,
-    sources: keyword.source ? [keyword.source] : [],
-    mode: "keyword",
-  });
+  try {
+    await logAssistantEntry({
+      timestamp: new Date().toISOString(),
+      question: trimmed,
+      mode: (payload.mode as "ai" | "keyword") ?? "keyword",
+      matched: Boolean(payload.matched),
+      sources: loggedSources,
+    });
+  } catch {
+    // logging must never break an answer
+  }
+
+  return NextResponse.json(payload);
 }

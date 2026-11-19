@@ -34,6 +34,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# assistant question log (visitor data, never commit)
+data/assistant-log.jsonl
+
 # vercel
 .vercel
 

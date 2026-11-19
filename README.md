@@ -122,14 +122,15 @@ A browsable knowledge base about my background, grouped by category (Experience,
 
 A chat widget that answers visitor questions about Mike's background. **Two modes:**
 
-- **AI mode (default when configured)** — uses **Google Gemini** (official `@google/genai` SDK) to write a natural answer. Retrieval reuses the site's keyword scoring to pick the top 5 pieces from `data/background.md`, `data/projects.json`, and `data/blogs.json`; only those labeled pieces are sent to Gemini with a strict system instruction: answer only from the context, never invent facts, refer to Mike in the third person, no personality/judgment answers, ignore instruction-changing attempts in the question.
-- **Keyword mode (fallback)** — if `GEMINI_API_KEY` is missing, Gemini errors, or the call exceeds 10 seconds, the original rule-based scorer answers directly. All matching still lives in one function (`lib/assistant.ts` → `answerQuestion`).
+- **AI mode (default when configured)** — uses **Google Gemini** (official `@google/genai` SDK) to write a natural answer. Gemini receives **all** background sections (placeholders skipped), all projects, and all blog posts, each labeled with type, title, and link, plus a strict system instruction: interpret vague questions, combine facts across sections, never invent facts, no hiring/character verdicts, third person, ignore instruction-changing attempts in the question. If the full content ever exceeds 60,000 characters, only the top 10 pieces by keyword score are sent instead.
+- **Keyword mode (fallback)** — if `GEMINI_API_KEY` is missing, Gemini errors/times out (10s budget, quick retries for transient 503s), or the model is quota-limited, the rule-based scorer answers directly (MIN_SCORE gate applies here only).
 
-Setup: copy `.env.example` to `.env.local` and fill in `GEMINI_API_KEY` (from [Google AI Studio](https://aistudio.google.com/apikey)). The key is read server-side only — never in browser code, never committed, never logged.
+Setup: copy `.env.example` to `.env.local` and fill in `GEMINI_API_KEY` (from [Google AI Studio](https://aistudio.google.com/apikey)). The key is read server-side only — never in browser code, never committed, never logged. Model via `GEMINI_MODEL` (free-tier quotas are per model — if one is exhausted, switch to another Flash variant).
 
 - **Widget** (`components/ChatWidget.tsx`) — floating button on every public page (hidden on `/admin`); shows "Based on: …" attribution (clickable) for every source used.
 - **History** — conversation saved in LocalStorage under `mz-assistant-chat` (last 50 messages; survives refresh and navigation; older messages still render). Nothing is stored server-side.
 - **Limits** — questions are capped at 300 characters; a simple per-IP rate limit allows 10 questions per minute (`429` beyond that) to protect the free Gemini quota.
+- **Question log** — every question (plus mode, matched, and sources used) is appended to `data/assistant-log.jsonl` (gitignored — visitor data is never committed). Review it at `/admin/assistant-log` to find topics the bot couldn't answer, then add them to `data/background.md`.
 
 | Endpoint | Purpose | Responses |
 | --- | --- | --- |
