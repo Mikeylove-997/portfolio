@@ -3,6 +3,10 @@ import path from "node:path";
 
 export type ContactSource = "api" | "server-action";
 
+export type ContactStatus = "new" | "read" | "replied";
+
+export const CONTACT_STATUSES: ContactStatus[] = ["new", "read", "replied"];
+
 export type ContactSubmission = {
   id: string;
   name: string;
@@ -10,6 +14,7 @@ export type ContactSubmission = {
   message: string;
   project: string | null;
   source: ContactSource | null;
+  status: ContactStatus;
   submittedAt: string;
 };
 
@@ -26,6 +31,9 @@ export async function readContacts(): Promise<ContactSubmission[]> {
         entry.source === "api" || entry.source === "server-action"
           ? entry.source
           : null,
+      status: CONTACT_STATUSES.includes(entry.status)
+        ? entry.status
+        : "new",
     }));
   } catch {
     return [];
@@ -33,7 +41,7 @@ export async function readContacts(): Promise<ContactSubmission[]> {
 }
 
 export async function addContact(
-  contact: Omit<ContactSubmission, "id" | "submittedAt">
+  contact: Omit<ContactSubmission, "id" | "submittedAt" | "status">
 ): Promise<ContactSubmission> {
   const submission: ContactSubmission = {
     id: crypto.randomUUID(),
@@ -42,6 +50,7 @@ export async function addContact(
     message: contact.message,
     project: contact.project,
     source: contact.source,
+    status: "new",
     submittedAt: new Date().toISOString(),
   };
 
@@ -52,4 +61,45 @@ export async function addContact(
   await fs.writeFile(DATA_FILE, JSON.stringify(contacts, null, 2), "utf8");
 
   return submission;
+}
+
+export async function getContactById(
+  id: string
+): Promise<ContactSubmission | null> {
+  const contacts = await readContacts();
+  return contacts.find((contact) => contact.id === id) ?? null;
+}
+
+export async function updateContactStatus(
+  id: string,
+  status: ContactStatus
+): Promise<ContactSubmission | null> {
+  const contacts = await readContacts();
+  const index = contacts.findIndex((contact) => contact.id === id);
+
+  if (index === -1) {
+    return null;
+  }
+
+  const updated: ContactSubmission = { ...contacts[index], status };
+  contacts[index] = updated;
+
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.writeFile(DATA_FILE, JSON.stringify(contacts, null, 2), "utf8");
+
+  return updated;
+}
+
+export async function deleteContact(id: string): Promise<boolean> {
+  const contacts = await readContacts();
+  const remaining = contacts.filter((contact) => contact.id !== id);
+
+  if (remaining.length === contacts.length) {
+    return false;
+  }
+
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.writeFile(DATA_FILE, JSON.stringify(remaining, null, 2), "utf8");
+
+  return true;
 }

@@ -6,7 +6,8 @@
     "message": "Hi Mike, I found your Financial Company Brain project through the blog post — impressive evidence handling. Could I ask you a few questions about the stack?",
     "project": null,
     "source": "api",
-    "submittedAt": "2026-11-12T08:15:00.000Z"
+    "submittedAt": "2026-11-12T08:15:00.000Z",
+    "status": "new"
   },
   {
     "id": "8d47b6f0-2e93-4c5a-8f1b-6a9e3d7c2b04",
@@ -15,6 +16,7 @@
     "message": "Great portfolio! I'd love to hear more about how you deployed the EWA prediction API and what you learned from the practicum.",
     "project": "company-brain",
     "source": "server-action",
-    "submittedAt": "2026-11-12T09:40:00.000Z"
+    "submittedAt": "2026-11-12T09:40:00.000Z",
+    "status": "new"
   }
 ]

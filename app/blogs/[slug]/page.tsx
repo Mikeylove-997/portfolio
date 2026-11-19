@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { Suspense } from "react";
-import { getBlogBySlug } from "@/lib/blogs";
 
 export default function BlogPostPage(props: PageProps<"/blogs/[slug]">) {
   return (
@@ -19,7 +19,18 @@ async function BlogContent({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await getBlogBySlug(slug);
+
+  const headerList = await headers();
+  const host = headerList.get("host") ?? "localhost:3000";
+  const protocol = host.startsWith("localhost") || host.startsWith("127.")
+    ? "http"
+    : "https";
+
+  const response = await fetch(
+    `${protocol}://${host}/api/blogs/${slug}`,
+    { cache: "no-store" }
+  );
+  const post: BlogPost | null = response.ok ? await response.json() : null;
 
   if (!post) {
     notFound();
@@ -40,6 +51,14 @@ async function BlogContent({
     </article>
   );
 }
+
+type BlogPost = {
+  id: string;
+  slug: string;
+  title: string;
+  content: string;
+  createdAt: string;
+};
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString("en-US", {

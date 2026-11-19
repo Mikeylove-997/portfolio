@@ -77,6 +77,31 @@ export async function addBlog({
   return { ok: true, post };
 }
 
+export async function updateBlog(
+  slug: string,
+  input: { title: string; content: string }
+): Promise<BlogPost | null> {
+  const blogs = await getAllBlogs();
+  const index = blogs.findIndex((post) => post.slug === slug);
+
+  if (index === -1) {
+    return null;
+  }
+
+  const updated: BlogPost = {
+    ...blogs[index],
+    title: input.title.trim(),
+    content: input.content.trim(),
+  };
+
+  blogs[index] = updated;
+
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.writeFile(DATA_FILE, JSON.stringify(blogs, null, 2), "utf8");
+
+  return updated;
+}
+
 export async function deleteBlog(slug: string): Promise<boolean> {
   const blogs = await getAllBlogs();
   const remaining = blogs.filter((post) => post.slug !== slug);

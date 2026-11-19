@@ -1,6 +1,19 @@
 import { NextResponse } from "next/server";
+import { connection } from "next/server";
 import { validateContact } from "@/lib/validation";
-import { addContact } from "@/lib/contacts";
+import { addContact, readContacts } from "@/lib/contacts";
+
+export async function GET() {
+  await connection();
+
+  const contacts = await readContacts();
+  const sorted = [...contacts].sort(
+    (a, b) =>
+      new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+  );
+
+  return NextResponse.json(sorted);
+}
 
 export async function POST(request: Request) {
   let body: unknown;

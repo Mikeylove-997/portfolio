@@ -69,7 +69,19 @@ The public blog pages and the create form are unchanged by the delete feature â€
 | --- | --- | --- |
 | `GET /api/blogs` | List all posts | `200` JSON array |
 | `POST /api/blogs` | Create a post | `201` post, `400` validation errors, `409` duplicate slug |
+| `GET /api/blogs/[slug]` | Fetch one post | `200` post, `404` if missing |
+| `PUT /api/blogs/[slug]` | Update a post's title/content | `200` updated, `400` validation errors, `404` if missing |
 | `DELETE /api/blogs/[slug]` | Delete a post | `204` on success, `404` if the slug doesn't exist |
+
+| Endpoint | Purpose | Responses |
+| --- | --- | --- |
+| `GET /api/contact` | List all submissions, newest first | `200` JSON array |
+| `POST /api/contact` | Save a submission | `201` `{ success: true }`, `400` field errors |
+| `GET /api/contact/[id]` | Fetch one submission | `200` submission, `404` if missing |
+| `PATCH /api/contact/[id]` | Update status only (`"new"`, `"read"`, `"replied"`) | `200` updated, `400` invalid status, `404` if missing |
+| `DELETE /api/contact/[id]` | Delete a submission | `204` on success, `404` if missing |
+
+Every submission carries a `status` (`"new"`, `"read"`, or `"replied"`); new submissions default to `"new"` and older entries without one are treated as `"new"`. The admin table (`/admin`) loads through `GET /api/contact` and manages status (dropdown) and deletion (with confirmation) per row.
 
 Storage lives in [`lib/blogs.ts`](lib/blogs.ts) (`getAllBlogs`, `getBlogBySlug`, `addBlog`, `deleteBlog`) and [`data/blogs.json`](data/blogs.json).
 
