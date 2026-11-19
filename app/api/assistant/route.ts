@@ -88,7 +88,7 @@ export async function POST(request: Request) {
       matched: usedSources.length > 0,
       source: usedSources[0] ?? null,
       sources: usedSources,
-      related: unusedSources.slice(0, 2),
+      related: usedSources.length > 0 ? unusedSources.slice(0, 2) : [],
       mode: "ai",
     });
   }
