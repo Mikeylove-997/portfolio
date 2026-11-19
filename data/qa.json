@@ -1,0 +1,50 @@
+[
+  {
+    "id": "023a61a9-3641-4502-8c4c-5129334b7738",
+    "question": "What do you study?",
+    "answer": "I study information systems at Santa Clara University. I like building things end to end — from Python analytics and machine learning projects to web applications with Next.js.",
+    "category": "Education",
+    "keywords": [
+      "education",
+      "santa clara university",
+      "scu",
+      "information systems",
+      "study",
+      "major"
+    ],
+    "createdAt": "2026-11-12T12:00:00.000Z",
+    "updatedAt": "2026-11-12T12:00:00.000Z"
+  },
+  {
+    "id": "dfc86aa7-6594-4630-b39f-4506880b36c1",
+    "question": "What kind of work have you done?",
+    "answer": "My work spans data science — predictive models, prescriptive analytics, and Tableau dashboards — and software development such as CLI tools and REST APIs. This portfolio itself is an example: it uses Next.js dynamic routes and a Server Action that saves contact form submissions to a JSON file.",
+    "category": "Experience",
+    "keywords": [
+      "experience",
+      "work",
+      "data science",
+      "software development",
+      "analytics",
+      "background"
+    ],
+    "createdAt": "2026-11-12T12:00:00.000Z",
+    "updatedAt": "2026-11-12T12:00:00.000Z"
+  },
+  {
+    "id": "e5d8af30-384e-4860-a243-5a79bc8aa916",
+    "question": "What is the Financial Company Brain project?",
+    "answer": "Financial Company Brain is a Streamlit analytics app that explains why profit missed budget in seconds: Python does the variance math, HydraDB retrieves the reasons from company documents, and every claim cites its source. When no document explains a number, it says so.",
+    "category": "Projects",
+    "keywords": [
+      "company brain",
+      "financial company brain",
+      "streamlit",
+      "hydradb",
+      "analytics",
+      "projects"
+    ],
+    "createdAt": "2026-11-12T12:00:00.000Z",
+    "updatedAt": "2026-11-12T12:00:00.000Z"
+  }
+]

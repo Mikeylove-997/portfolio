@@ -27,6 +27,7 @@ const navLinks = [
   { href: "/about-me", label: "About Me" },
   { href: "/projects", label: "Projects" },
   { href: "/blogs", label: "Blogs" },
+  { href: "/qa", label: "Q&A" },
   { href: "/contact-me", label: "Contact" },
   { href: "/contact-me-server-form", label: "Contact (Server)" },
 ];

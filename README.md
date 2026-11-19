@@ -102,6 +102,22 @@ Projects are no longer hardcoded — they live in [`data/projects.json`](data/pr
 | `PUT /api/projects/[slug]` | Update a project | `200` updated, `400` field errors, `404` if missing |
 | `DELETE /api/projects/[slug]` | Delete a project | `204` on success, `404` if missing |
 
+## Q&A Knowledge Base (`/qa`, `/admin/qa`)
+
+A browsable knowledge base about my background, grouped by category (Experience, Projects, Skills, Education, Working style). Entries live in [`data/qa.json`](data/qa.json) and are served through the API:
+
+- **Public** (`/qa`) — loads `GET /api/qa` at request time and groups entries by category; each question expands to its answer (no JavaScript needed).
+- **Admin** (`/admin/qa`) — one form for create (`POST /api/qa`) and edit (`PUT /api/qa/[id]`, pre-filled); keywords are entered comma-separated; deleting asks for confirmation.
+- **Validation** (server-side, `lib/qa.ts`): question and answer are required; category must be one of the allowed values; keywords is an optional list of non-empty strings.
+
+| Endpoint | Purpose | Responses |
+| --- | --- | --- |
+| `GET /api/qa` | List entries (optional `?category=` filter) | `200` JSON array |
+| `POST /api/qa` | Create an entry | `201` entry, `400` field errors |
+| `GET /api/qa/[id]` | Fetch one entry | `200` entry, `404` if missing |
+| `PUT /api/qa/[id]` | Update an entry | `200` updated, `400` field errors, `404` if missing |
+| `DELETE /api/qa/[id]` | Delete an entry | `204` on success, `404` if missing |
+
 ## Getting Started
 
 ```bash

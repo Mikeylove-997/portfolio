@@ -377,6 +377,32 @@ h2 {
   font-size: 0.875rem;
 }
 
+.qa-group {
+  margin-bottom: 2rem;
+}
+
+.qa-group h2 {
+  margin-bottom: 0.75rem;
+}
+
+.qa-card {
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.qa-question {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.qa-answer {
+  margin-top: 0.75rem;
+}
+
+.qa-answer p {
+  line-height: 1.6;
+}
+
 .form button {
   align-self: flex-start;
   cursor: pointer;
