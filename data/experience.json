@@ -1,0 +1,57 @@
+[
+  {
+    "id": "b9f611f7-b2d0-4199-bd73-c28f21885fff",
+    "company": "BMO (Bank of Montreal)",
+    "title": "Personal Banker",
+    "location": "",
+    "startDate": "",
+    "endDate": null,
+    "industry": "Banking",
+    "highlights": [],
+    "skills": []
+  },
+  {
+    "id": "3c151fdf-2adc-4d42-8267-8276165040ef",
+    "company": "Coast Capital Savings",
+    "title": "Business Banking Officer",
+    "location": "",
+    "startDate": "",
+    "endDate": null,
+    "industry": "Banking",
+    "highlights": [],
+    "skills": []
+  },
+  {
+    "id": "d70d2f2e-8aa6-4ebf-b7d3-00408ddf412b",
+    "company": "Apple",
+    "title": "Product Specialist",
+    "location": "",
+    "startDate": "",
+    "endDate": null,
+    "industry": "Tech",
+    "highlights": [],
+    "skills": []
+  },
+  {
+    "id": "a143520c-cc2d-4a7d-9852-24e8fd60b02e",
+    "company": "Infosys",
+    "title": "Technology Associate",
+    "location": "",
+    "startDate": "",
+    "endDate": null,
+    "industry": "Consulting",
+    "highlights": [],
+    "skills": []
+  },
+  {
+    "id": "03b0c727-e938-4e3b-af6c-12804b413887",
+    "company": "Lululemon",
+    "title": "",
+    "location": "",
+    "startDate": "",
+    "endDate": null,
+    "industry": "Retail",
+    "highlights": [],
+    "skills": []
+  }
+]

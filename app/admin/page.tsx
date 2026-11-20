@@ -34,6 +34,9 @@ export default function AdminPage() {
         <Link href="/admin/qa" className="btn secondary">
           Manage Q&A →
         </Link>
+        <Link href="/admin/experience" className="btn secondary">
+          Manage Experience →
+        </Link>
         <Link href="/admin/assistant-log" className="btn secondary">
           Assistant Log →
         </Link>

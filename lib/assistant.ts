@@ -1,6 +1,8 @@
 import { getBackgroundSections } from "@/lib/background";
 import { getAllProjects } from "@/lib/projects";
 import { getAllBlogs } from "@/lib/blogs";
+import { getAllExperience } from "@/lib/experience";
+import { formatExperienceDates } from "@/lib/experience-shared";
 
 export const FALLBACK_ANSWER =
   "I don't have an answer for that yet. Try asking about Mike's experience, projects, skills, or education — or reach him through the contact form.";
@@ -10,7 +12,11 @@ const TITLE_WORD_SCORE = 5;
 const BODY_WORD_SCORE = 2;
 const EXCERPT_LENGTH = 200;
 
-export type AssistantSourceType = "background" | "project" | "blog";
+export type AssistantSourceType =
+  | "background"
+  | "project"
+  | "blog"
+  | "experience";
 
 export type AssistantSource = {
   type: AssistantSourceType;
@@ -150,10 +156,11 @@ type Doc = {
 };
 
 async function buildDocs(): Promise<Doc[]> {
-  const [sections, projects, posts] = await Promise.all([
+  const [sections, projects, posts, roles] = await Promise.all([
     getBackgroundSections(),
     getAllProjects(),
     getAllBlogs(),
+    getAllExperience(),
   ]);
 
   const docs: Doc[] = [];
@@ -209,6 +216,39 @@ async function buildDocs(): Promise<Doc[]> {
       context: `Title: ${post.title}\nContent: ${post.content}`,
       titleTokens: contentTokens(post.title),
       bodyTokens: contentTokens(post.content),
+    });
+  }
+
+  for (const role of roles) {
+    const dates = role.startDate
+      ? formatExperienceDates(role)
+      : "Dates not set yet";
+    const headline = role.title
+      ? `${role.title} at ${role.company}`
+      : role.company;
+    docs.push({
+      source: {
+        type: "experience",
+        id: role.id,
+        label: role.company,
+        link: "/about-me",
+      },
+      answer: `${headline} (${dates})`,
+      context: [
+        `Company: ${role.company}`,
+        `Title: ${role.title || "Not set yet"}`,
+        `Location: ${role.location || "Not set yet"}`,
+        `Industry: ${role.industry}`,
+        `Dates: ${dates}`,
+        `Highlights: ${role.highlights.join("; ") || "None listed yet"}`,
+        `Skills: ${role.skills.join(", ") || "None listed yet"}`,
+      ].join("\n"),
+      titleTokens: contentTokens(
+        [role.company, role.title, role.industry].join(" ")
+      ),
+      bodyTokens: contentTokens(
+        [...role.highlights, ...role.skills, role.location].join(" ")
+      ),
     });
   }
 

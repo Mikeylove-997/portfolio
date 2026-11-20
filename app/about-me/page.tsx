@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { headers } from "next/headers";
+import { Suspense } from "react";
 import aboutPhoto from "../../public/images/about-me.jpg";
+import ExperienceTimeline from "@/components/ExperienceTimeline";
+import type { Experience } from "@/lib/experience";
 
 export const metadata: Metadata = {
   title: "About Me",
@@ -48,6 +52,9 @@ export default function AboutPage() {
           </p>
         </div>
       </section>
+      <Suspense fallback={<p className="lead">Loading experience...</p>}>
+        <ExperienceSection />
+      </Suspense>
       <section className="card">
         <h2>Skills</h2>
         <ul className="pill-list">
@@ -67,5 +74,25 @@ export default function AboutPage() {
         </p>
       </section>
     </main>
+  );
+}
+
+async function ExperienceSection() {
+  const headerList = await headers();
+  const host = headerList.get("host") ?? "localhost:3000";
+  const protocol = host.startsWith("localhost") || host.startsWith("127.")
+    ? "http"
+    : "https";
+
+  const response = await fetch(`${protocol}://${host}/api/experience`, {
+    cache: "no-store",
+  });
+  const entries: Experience[] = response.ok ? await response.json() : [];
+
+  return (
+    <section>
+      <h2>Experience</h2>
+      <ExperienceTimeline entries={entries} />
+    </section>
   );
 }

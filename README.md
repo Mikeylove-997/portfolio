@@ -15,8 +15,9 @@ A portfolio website for ISBA 2438 built with **Next.js (App Router)**, **TypeScr
 | `/blogs` | Blog index — lists every post from `data/blogs.json` |
 | `/blogs/[slug]` | **Dynamically routed** blog post pages; unknown slugs show a "Post not found" page |
 | `/admin` | Submissions viewer — table of everything saved by both contact forms (newest first). Not linked in the nav. |
-| `/admin/blogs` | Blog manager — publish new posts via `POST /api/blogs` and **delete** existing ones |
+| `/admin/blogs` | Blog manager — create, edit, and delete posts |
 | `/admin/projects` | Project manager — **create, edit, and delete** projects via the projects API |
+| `/admin/experience` | Experience manager — **create, edit, and delete** employment-history entries; the single source of job information for the site and the assistant |
 
 ## How the Contact Form Works (`/contact-me-server-form`)
 
@@ -103,6 +104,23 @@ Projects are no longer hardcoded — they live in [`data/projects.json`](data/pr
 | `PUT /api/projects/[slug]` | Update a project | `200` updated, `400` field errors, `404` if missing |
 | `DELETE /api/projects/[slug]` | Delete a project | `204` on success, `404` if missing |
 
+## Experience: Full CRUD (`data/experience.json`)
+
+Employment history lives in [`data/experience.json`](data/experience.json) and is the **single source of job information** for the site and the assistant (the `## Experience —` sections were removed from `data/background.md`):
+
+- **Public** — `/about-me` shows an "Experience" timeline loaded live from `GET /api/experience`, sorted newest first with current roles at top. Entries without a start date stay hidden from the public timeline until filled in.
+- **Entry shape** — `id` (generated), `company`, `title`, `location`, `startDate` (`"YYYY-MM"`), `endDate` (`"YYYY-MM"` or `null` for a current role), `industry` (one of `Banking`, `Tech`, `Retail`, `Consulting`, `Other`), `highlights` and `skills` (lists).
+- **Admin** (`/admin/experience`) — `ExperienceForm` + `ExperienceAdminList` coordinated by `ExperienceManager`; highlights and skills are entered one per line; dates use a month picker; deleting asks for confirmation first. Reuses `FieldError`, `ConfirmDeleteButton`, and `AdminPageHeader`.
+- **Validation** (server-side, `lib/experience.ts`): company and title required; dates must be `YYYY-MM` if present; end date can't be before the start date; industry must be an allowed value.
+
+| Endpoint | Purpose | Responses |
+| --- | --- | --- |
+| `GET /api/experience` | List entries (sorted: current roles first, then newest) | `200` JSON array |
+| `POST /api/experience` | Create an entry | `201` entry, `400` field errors |
+| `GET /api/experience/[id]` | Fetch one entry | `200` entry, `404` if missing |
+| `PUT /api/experience/[id]` | Update an entry | `200` updated, `400` field errors, `404` if missing |
+| `DELETE /api/experience/[id]` | Delete an entry | `204` on success, `404` if missing |
+
 ## Q&A Knowledge Base (`/qa`, `/admin/qa`)
 
 A browsable knowledge base about my background, grouped by category (Experience, Projects, Skills, Education, Working style). Entries live in [`data/qa.json`](data/qa.json) and are served through the API:
@@ -123,7 +141,7 @@ A browsable knowledge base about my background, grouped by category (Experience,
 
 A chat widget that answers visitor questions about Mike's background. **Two modes:**
 
-- **AI mode (default when configured)** — uses **Google Gemini** (official `@google/genai` SDK) to write a natural answer. Gemini receives **all** background sections (placeholders skipped), all projects, and all blog posts, each labeled with type, title, and link, plus a strict system instruction: interpret vague questions, combine facts across sections, never invent facts, no hiring/character verdicts, third person, ignore instruction-changing attempts in the question. If the full content ever exceeds 60,000 characters, only the top 10 pieces by keyword score are sent instead.
+- **AI mode (default when configured)** — uses **Google Gemini** (official `@google/genai` SDK) to write a natural answer. Gemini receives **all** experience entries, background sections (placeholders skipped), projects, and blog posts, each labeled with type, title, and link, plus a strict system instruction: interpret vague questions, combine facts across sections, never invent facts, no hiring/character verdicts, third person, ignore instruction-changing attempts in the question. If the full content ever exceeds 60,000 characters, only the top 10 pieces by keyword score are sent instead.
 - **Keyword mode (fallback)** — if `GEMINI_API_KEY` is missing, Gemini errors/times out (10s budget, quick retries for transient 503s), or the model is quota-limited, the rule-based scorer answers directly (MIN_SCORE gate applies here only).
 
 Setup: copy `.env.example` to `.env.local` and fill in `GEMINI_API_KEY` (from [Google AI Studio](https://aistudio.google.com/apikey)). The key is read server-side only — never in browser code, never committed, never logged. Model via `GEMINI_MODEL` (free-tier quotas are per model — if one is exhausted, switch to another Flash variant).
@@ -157,6 +175,8 @@ Shared display and admin components, one job per file, all driven by props (disp
 | `ProjectForm` / `ProjectAdminList` / `ProjectManager` | Admin project form / list / coordinator (state + fetch calls) | `/admin/projects` |
 | `BlogForm` / `BlogAdminList` / `BlogManager` | Admin blog form / list / coordinator (state + fetch calls) | `/admin/blogs` |
 | `QACard` / `QAList` / `QAForm` / `QAManager` | Public Q&A display and admin management | `/qa`, `/admin/qa` |
+| `ExperienceCard` / `ExperienceTimeline` | One role (title, company, dates, highlights, skill tags) and the public list | `/about-me` |
+| `ExperienceForm` / `ExperienceAdminList` / `ExperienceManager` | Admin experience form / list / coordinator (state + fetch calls) | `/admin/experience` |
 | `SubmissionsTable` | Contact submissions table with status dropdown and delete | `/admin` |
 | `AssistantLogList` | Assistant question log with delete | `/admin/assistant-log` |
 | `ChatWidget` / `ChatMessage` / `ChatInput` / `StarterQuestions` | Floating assistant chat (LocalStorage history) | every public page |
