@@ -54,14 +54,15 @@ curl -X POST http://localhost:3000/api/contact \
   -d '{"name":"Mike","email":"mike@scu.edu","message":"Hello"}'
 ```
 
-## Blog: Publishing and Deleting (`/admin/blogs`)
+## Blog: Creating, Editing, and Deleting (`/admin/blogs`)
 
-The admin page manages posts end to end — create and delete — against the same `data/blogs.json` file that `/blogs` reads:
+The admin page manages posts end to end — create, edit, and delete — against the same `data/blogs.json` file that `/blogs` reads:
 
 - **Create** — `components/BlogForm.tsx` sends a JSON `POST /api/blogs` request. The server generates the slug from the title (`lib/blogs.ts` → `addBlog`), rejects duplicate slugs with `409`, and shows per-field errors (`400`) inline. New posts appear on `/blogs` immediately.
-- **Delete** — `components/BlogList.tsx` lists existing posts (title + date) below the form. Each row's Delete button asks `Delete this post?` with a browser confirm dialog, then calls `DELETE /api/blogs/[slug]`. On success (`204`) the row is removed and a "Post deleted." message appears; if the post was already gone the API returns `404` and the list shows an error instead. Unknown slugs never crash the page.
+- **Edit** — each row in `components/BlogAdminList.tsx` has an Edit button that pre-fills the form; saving sends `PUT /api/blogs/[slug]` and keeps the same slug so existing links never break.
+- **Delete** — each row's Delete button (shared `ConfirmDeleteButton`) asks `Delete this post?` with a browser confirm dialog, then calls `DELETE /api/blogs/[slug]`. On success (`204`) the row is removed and a "Post deleted." message appears; if the post was already gone the API returns `404` and the list shows a message instead. Unknown slugs never crash the page.
 
-The public blog pages and the create form are unchanged by the delete feature — it only adds a management UI on top of the same data file.
+`components/BlogManager.tsx` coordinates the two — it owns the form state and all fetch calls; `BlogForm` and `BlogAdminList` are display components driven by props. (`BlogList.tsx` no longer exists — it was replaced by this split.)
 
 ### Blog API Endpoints
 
@@ -128,7 +129,7 @@ A chat widget that answers visitor questions about Mike's background. **Two mode
 Setup: copy `.env.example` to `.env.local` and fill in `GEMINI_API_KEY` (from [Google AI Studio](https://aistudio.google.com/apikey)). The key is read server-side only — never in browser code, never committed, never logged. Model via `GEMINI_MODEL` (free-tier quotas are per model — if one is exhausted, switch to another Flash variant).
 
 - **Widget** (`components/ChatWidget.tsx`) — floating button on every public page (hidden on `/admin`); shows "Based on: …" attribution (clickable) for every source used.
-- **History** — conversation saved in LocalStorage under `mz-assistant-chat` (last 50 messages; survives refresh and navigation; older messages still render). Nothing is stored server-side.
+- **History** — conversation saved in LocalStorage under `mz-assistant-chat` (last 50 messages; survives refresh and navigation; older messages still render). Chat history is stored only in the visitor's browser; the questions themselves are logged on the server in a gitignored file for the admin log (below).
 - **Limits** — questions are capped at 300 characters; a simple per-IP rate limit allows 10 questions per minute (`429` beyond that) to protect the free Gemini quota.
 - **Question log** — every question (plus mode, matched, and sources used) is appended to `data/assistant-log.jsonl` (gitignored — visitor data is never committed). Review it at `/admin/assistant-log` to find topics the bot couldn't answer, then add them to `data/background.md`. Entries can be deleted (with confirmation) from the admin page.
 
@@ -141,14 +142,35 @@ Setup: copy `.env.example` to `.env.local` and fill in `GEMINI_API_KEY` (from [G
 | --- | --- | --- |
 | `POST /api/assistant` | Ask a question (`{ question: string }`) | `200` `{ answer, matched, source, sources, related, mode }` — `mode` is `"ai"` or `"keyword"` (for testing) — `400` invalid input, `429` rate-limited |
 
-## Getting Started
+## Components
+
+Shared display and admin components, one job per file, all driven by props (display components never fetch data):
+
+| Component | Purpose | Where used |
+| --- | --- | --- |
+| `TechTags` | Tech-stack pill list | ProjectCard, `/projects/[slug]` |
+| `FieldError` | Inline error message under a form field | ProjectForm, BlogForm, QAForm |
+| `ConfirmDeleteButton` | Delete button with browser confirm dialog, then callback | ProjectAdminList, BlogAdminList, QAManager, SubmissionsTable, AssistantLogList |
+| `AdminPageHeader` | Optional back link + title + lead paragraph | all `/admin` pages |
+| `ProjectCard` | Project card (title, description, tech tags, link) | `/projects` |
+| `BlogCard` | Blog card (date, title, excerpt, link) | `/blogs` |
+| `ProjectForm` / `ProjectAdminList` / `ProjectManager` | Admin project form / list / coordinator (state + fetch calls) | `/admin/projects` |
+| `BlogForm` / `BlogAdminList` / `BlogManager` | Admin blog form / list / coordinator (state + fetch calls) | `/admin/blogs` |
+| `QACard` / `QAList` / `QAForm` / `QAManager` | Public Q&A display and admin management | `/qa`, `/admin/qa` |
+| `SubmissionsTable` | Contact submissions table with status dropdown and delete | `/admin` |
+| `AssistantLogList` | Assistant question log with delete | `/admin/assistant-log` |
+| `ChatWidget` / `ChatMessage` / `ChatInput` / `StarterQuestions` | Floating assistant chat (LocalStorage history) | every public page |
+| `ApiContactForm` / `contact-form` | The two contact forms (API call / Server Action) | `/contact-me`, `/contact-me-server-form`, `/projects/[slug]` |
+
+## Setup
 
 ```bash
 npm install
+cp .env.example .env.local   # optionally add a GEMINI_API_KEY for AI mode
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). The Mike Zhao Assistant works without a key — it falls back to keyword mode; add a Gemini key to enable AI answers.
 
 ## Tech
 

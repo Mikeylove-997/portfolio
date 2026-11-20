@@ -34,8 +34,9 @@ export default function AboutPage() {
         <div>
           <h2>Hi, I&apos;m Mike Zhao</h2>
           <p>
-            I am a student at Santa Clara University studying information
-            systems. I like building things end to end — from Python analytics
+            I am a student at Santa Clara University pursuing an MS in
+            Business Analytics (MSBA). I like building things end to end —
+            from Python analytics
             and machine learning projects to web applications with Next.js.
           </p>
           <p>
