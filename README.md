@@ -130,7 +130,12 @@ Setup: copy `.env.example` to `.env.local` and fill in `GEMINI_API_KEY` (from [G
 - **Widget** (`components/ChatWidget.tsx`) — floating button on every public page (hidden on `/admin`); shows "Based on: …" attribution (clickable) for every source used.
 - **History** — conversation saved in LocalStorage under `mz-assistant-chat` (last 50 messages; survives refresh and navigation; older messages still render). Nothing is stored server-side.
 - **Limits** — questions are capped at 300 characters; a simple per-IP rate limit allows 10 questions per minute (`429` beyond that) to protect the free Gemini quota.
-- **Question log** — every question (plus mode, matched, and sources used) is appended to `data/assistant-log.jsonl` (gitignored — visitor data is never committed). Review it at `/admin/assistant-log` to find topics the bot couldn't answer, then add them to `data/background.md`.
+- **Question log** — every question (plus mode, matched, and sources used) is appended to `data/assistant-log.jsonl` (gitignored — visitor data is never committed). Review it at `/admin/assistant-log` to find topics the bot couldn't answer, then add them to `data/background.md`. Entries can be deleted (with confirmation) from the admin page.
+
+| Endpoint | Purpose | Responses |
+| --- | --- | --- |
+| `GET /api/assistant-log` | List logged questions, newest first | `200` `[entries]` |
+| `DELETE /api/assistant-log/[id]` | Delete one logged question | `204`, `404` |
 
 | Endpoint | Purpose | Responses |
 | --- | --- | --- |
