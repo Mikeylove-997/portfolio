@@ -68,9 +68,12 @@ export default function AboutPage() {
       <section className="card">
         <h2>Education</h2>
         <p>
-          <strong>Santa Clara University</strong> — Information Systems,
-          coursework in full-stack web development, databases, and data
-          analytics.
+          <strong>Santa Clara University</strong> — MS in Business Analytics
+          (MSBA), expected December 2026.
+        </p>
+        <p>
+          <strong>University of Toronto</strong> — Bachelor of Arts in
+          Economics and Political Science, Sep 2016 – Jun 2021.
         </p>
       </section>
     </main>

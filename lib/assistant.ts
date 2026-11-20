@@ -231,7 +231,7 @@ async function buildDocs(): Promise<Doc[]> {
         type: "experience",
         id: role.id,
         label: role.company,
-        link: "/about-me",
+        link: "/experience",
       },
       answer: `${headline} (${dates})`,
       context: [

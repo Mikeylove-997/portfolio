@@ -8,6 +8,7 @@ A portfolio website for ISBA 2438 built with **Next.js (App Router)**, **TypeScr
 | --- | --- |
 | `/` | Landing page with hero and quick links |
 | `/about-me` | About Me — bio, skills, education, and photo |
+| `/experience` | Employment history — timeline loaded live from `GET /api/experience`, newest first with current roles at top; entries without dates stay hidden |
 | `/contact-me` | Contact form that makes a client-side **API call** to `POST /api/contact` — shows per-field errors from the server |
 | `/contact-me-server-form` | Contact form handled by a **Server Action**; submissions are saved to `data/submissions.json` |
 | `/projects` | Lists all projects |
@@ -108,7 +109,7 @@ Projects are no longer hardcoded — they live in [`data/projects.json`](data/pr
 
 Employment history lives in [`data/experience.json`](data/experience.json) and is the **single source of job information** for the site and the assistant (the `## Experience —` sections were removed from `data/background.md`):
 
-- **Public** — `/about-me` shows an "Experience" timeline loaded live from `GET /api/experience`, sorted newest first with current roles at top. Entries without a start date stay hidden from the public timeline until filled in.
+- **Public** — `/about-me` shows an "Experience" timeline under the intro, and `/experience` is a dedicated page with the same timeline — both loaded live from `GET /api/experience`, sorted newest first with current roles at top. Entries without a start date stay hidden from the public pages until filled in.
 - **Entry shape** — `id` (generated), `company`, `title`, `location`, `startDate` (`"YYYY-MM"`), `endDate` (`"YYYY-MM"` or `null` for a current role), `industry` (one of `Banking`, `Tech`, `Retail`, `Consulting`, `Other`), `highlights` and `skills` (lists).
 - **Admin** (`/admin/experience`) — `ExperienceForm` + `ExperienceAdminList` coordinated by `ExperienceManager`; highlights and skills are entered one per line; dates use a month picker; deleting asks for confirmation first. Reuses `FieldError`, `ConfirmDeleteButton`, and `AdminPageHeader`.
 - **Validation** (server-side, `lib/experience.ts`): company and title required; dates must be `YYYY-MM` if present; end date can't be before the start date; industry must be an allowed value.
