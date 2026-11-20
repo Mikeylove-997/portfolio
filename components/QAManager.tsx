@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { QAEntry } from "@/lib/qa";
 import QACard from "@/components/QACard";
 import QAForm from "@/components/QAForm";
+import ConfirmDeleteButton from "@/components/ConfirmDeleteButton";
 
 export default function QAManager() {
   const [entries, setEntries] = useState<QAEntry[]>([]);
@@ -130,13 +131,10 @@ export default function QAManager() {
                 >
                   Edit
                 </button>
-                <button
-                  type="button"
-                  className="btn danger"
-                  onClick={() => handleDelete(entry)}
-                >
-                  Delete
-                </button>
+                <ConfirmDeleteButton
+                  confirmMessage={`Delete this entry: "${entry.question}"?`}
+                  onConfirmed={() => handleDelete(entry)}
+                />
               </div>
             </div>
           ))}

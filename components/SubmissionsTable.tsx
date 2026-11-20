@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ConfirmDeleteButton from "@/components/ConfirmDeleteButton";
 
 type ContactSubmission = {
   id: string;
@@ -162,13 +163,10 @@ export default function SubmissionsTable() {
                   </select>
                 </td>
                 <td>
-                  <button
-                    type="button"
-                    className="btn danger"
-                    onClick={() => handleDelete(submission)}
-                  >
-                    Delete
-                  </button>
+                  <ConfirmDeleteButton
+                    confirmMessage={`Delete this submission from ${submission.name}? This cannot be undone.`}
+                    onConfirmed={() => handleDelete(submission)}
+                  />
                 </td>
               </tr>
             ))}

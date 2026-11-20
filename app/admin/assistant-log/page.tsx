@@ -3,6 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { Suspense } from "react";
 import { getAssistantLog } from "@/lib/assistantLog";
+import AdminPageHeader from "@/components/AdminPageHeader";
 
 export const metadata: Metadata = {
   title: "Admin — Assistant Log",
@@ -23,17 +24,19 @@ function formatTimestamp(iso: string): string {
 export default function AssistantLogPage() {
   return (
     <main className="container page">
-      <Link href="/admin" className="back-link">
-        ← Admin
-      </Link>
-      <h1>Assistant Question Log</h1>
-      <p className="lead">
-        Every question visitors asked Mike Zhao Assistant, newest first —
-        stored locally in <code>data/assistant-log.jsonl</code> (gitignored,
-        never committed). Review what people ask that the bot can&apos;t
-        answer yet, then add those topics to{" "}
-        <code>data/background.md</code>.
-      </p>
+      <AdminPageHeader
+        title="Assistant Question Log"
+        lead={
+          <>
+            Every question visitors asked Mike Zhao Assistant, newest first —
+            stored locally in <code>data/assistant-log.jsonl</code>{" "}
+            (gitignored, never committed). Review what people ask that the bot
+            can&apos;t answer yet, then add those topics to{" "}
+            <code>data/background.md</code>.
+          </>
+        }
+        backHref="/admin"
+      />
       <Suspense fallback={<p className="page-loading">Loading…</p>}>
         <LogTable />
       </Suspense>

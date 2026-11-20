@@ -1,6 +1,7 @@
 "use client";
 
 import { QA_CATEGORIES } from "@/lib/qa-categories";
+import FieldError from "@/components/FieldError";
 import type { QAEntry } from "@/lib/qa";
 import { useState } from "react";
 
@@ -95,9 +96,7 @@ export default function QAForm({
               setForm({ ...form, question: event.target.value })
             }
           />
-          {fieldErrors.question ? (
-            <p className="field-error">{fieldErrors.question}</p>
-          ) : null}
+          <FieldError message={fieldErrors.question} />
         </div>
         <div className="field">
           <label htmlFor="qa-answer">Answer</label>
@@ -111,9 +110,7 @@ export default function QAForm({
               setForm({ ...form, answer: event.target.value })
             }
           />
-          {fieldErrors.answer ? (
-            <p className="field-error">{fieldErrors.answer}</p>
-          ) : null}
+          <FieldError message={fieldErrors.answer} />
         </div>
         <div className="field">
           <label htmlFor="qa-category">Category</label>
@@ -131,9 +128,7 @@ export default function QAForm({
               </option>
             ))}
           </select>
-          {fieldErrors.category ? (
-            <p className="field-error">{fieldErrors.category}</p>
-          ) : null}
+          <FieldError message={fieldErrors.category} />
         </div>
         <div className="field">
           <label htmlFor="qa-keywords">Keywords (comma-separated)</label>
@@ -147,9 +142,7 @@ export default function QAForm({
               setForm({ ...form, keywordsText: event.target.value })
             }
           />
-          {fieldErrors.keywords ? (
-            <p className="field-error">{fieldErrors.keywords}</p>
-          ) : null}
+          <FieldError message={fieldErrors.keywords} />
         </div>
         <button type="submit" disabled={sending}>
           {sending ? "Saving..." : editing ? "Save Changes" : "Create Entry"}

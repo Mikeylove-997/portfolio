@@ -1,28 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import type { Project } from "@/components/ProjectCard";
+import ProjectForm from "@/components/ProjectForm";
+import type { ProjectFieldErrors, ProjectFormState } from "@/components/ProjectForm";
+import ProjectAdminList from "@/components/ProjectAdminList";
 
-type Project = {
-  slug: string;
-  title: string;
-  description: string;
-  techStack: string[];
-  features: string[];
-  repoUrl: string;
-  liveUrl?: string;
-};
-
-type FieldErrors = {
-  title?: string;
-  description?: string;
-  techStack?: string;
-  features?: string;
-  repoUrl?: string;
-  liveUrl?: string;
-};
-
-const EMPTY_FORM = {
+const EMPTY_FORM: ProjectFormState = {
   title: "",
   description: "",
   techStackText: "",
@@ -36,7 +20,7 @@ export default function ProjectManager() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(EMPTY_FORM);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [fieldErrors, setFieldErrors] = useState<ProjectFieldErrors>({});
   const [message, setMessage] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const [sending, setSending] = useState(false);
@@ -150,10 +134,6 @@ export default function ProjectManager() {
     setFailed(false);
     setMessage(null);
 
-    if (!window.confirm("Delete this project?")) {
-      return;
-    }
-
     try {
       const res = await fetch(`/api/projects/${project.slug}`, {
         method: "DELETE",
@@ -206,154 +186,21 @@ export default function ProjectManager() {
         </p>
       ) : null}
 
-      <div className="card form-card">
-        <h2>{editingSlug ? "Edit Project" : "Add a New Project"}</h2>
-        <form onSubmit={handleSubmit} className="form" noValidate>
-          <div className="field">
-            <label htmlFor="project-title">Title</label>
-            <input
-              id="project-title"
-              name="title"
-              type="text"
-              placeholder="Financial Company Brain"
-              value={form.title}
-              onChange={(event) =>
-                setForm({ ...form, title: event.target.value })
-              }
-            />
-            {fieldErrors.title ? (
-              <p className="field-error">{fieldErrors.title}</p>
-            ) : null}
-          </div>
-          <div className="field">
-            <label htmlFor="project-description">Description</label>
-            <textarea
-              id="project-description"
-              name="description"
-              rows={3}
-              placeholder="One short paragraph: what it does and how."
-              value={form.description}
-              onChange={(event) =>
-                setForm({ ...form, description: event.target.value })
-              }
-            />
-            {fieldErrors.description ? (
-              <p className="field-error">{fieldErrors.description}</p>
-            ) : null}
-          </div>
-          <div className="field">
-            <label htmlFor="project-tech-stack">Tech Stack (one per line)</label>
-            <textarea
-              id="project-tech-stack"
-              name="techStack"
-              rows={4}
-              placeholder={"Python\nStreamlit\nLLM"}
-              value={form.techStackText}
-              onChange={(event) =>
-                setForm({ ...form, techStackText: event.target.value })
-              }
-            />
-            {fieldErrors.techStack ? (
-              <p className="field-error">{fieldErrors.techStack}</p>
-            ) : null}
-          </div>
-          <div className="field">
-            <label htmlFor="project-features">Key Features (one per line)</label>
-            <textarea
-              id="project-features"
-              name="features"
-              rows={4}
-              placeholder={"Variance analysis\nCited answers"}
-              value={form.featuresText}
-              onChange={(event) =>
-                setForm({ ...form, featuresText: event.target.value })
-              }
-            />
-            {fieldErrors.features ? (
-              <p className="field-error">{fieldErrors.features}</p>
-            ) : null}
-          </div>
-          <div className="field">
-            <label htmlFor="project-repo-url">Repository URL</label>
-            <input
-              id="project-repo-url"
-              name="repoUrl"
-              type="url"
-              placeholder="https://github.com/yourname/repo"
-              value={form.repoUrl}
-              onChange={(event) =>
-                setForm({ ...form, repoUrl: event.target.value })
-              }
-            />
-            {fieldErrors.repoUrl ? (
-              <p className="field-error">{fieldErrors.repoUrl}</p>
-            ) : null}
-          </div>
-          <div className="field">
-            <label htmlFor="project-live-url">Live URL (optional)</label>
-            <input
-              id="project-live-url"
-              name="liveUrl"
-              type="url"
-              placeholder="https://your-app.example.com"
-              value={form.liveUrl}
-              onChange={(event) =>
-                setForm({ ...form, liveUrl: event.target.value })
-              }
-            />
-            {fieldErrors.liveUrl ? (
-              <p className="field-error">{fieldErrors.liveUrl}</p>
-            ) : null}
-          </div>
-          <button type="submit" disabled={sending}>
-            {sending
-              ? "Saving..."
-              : editingSlug
-                ? "Save Changes"
-                : "Create Project"}
-          </button>
-        </form>
-      </div>
+      <ProjectForm
+        form={form}
+        fieldErrors={fieldErrors}
+        sending={sending}
+        editingSlug={editingSlug}
+        onChange={setForm}
+        onSubmit={handleSubmit}
+      />
 
-      <h2 className="admin-list-heading">Existing Projects</h2>
-      {loading ? (
-        <p className="muted">Loading projects...</p>
-      ) : projects.length === 0 ? (
-        <p className="muted">
-          No projects yet. Use the form above to create one.
-        </p>
-      ) : (
-        <div className="card blog-list-card">
-          {projects.map((project) => (
-            <div key={project.slug} className="blog-row">
-              <div>
-                <Link href={`/projects/${project.slug}`} className="view-link">
-                  {project.title}
-                </Link>
-                <p className="post-date">
-                  {project.slug} · {project.techStack.join(", ")}
-                </p>
-              </div>
-              <div className="row-actions">
-                <button
-                  type="button"
-                  className="btn secondary"
-                  onClick={() => startEdit(project)}
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  className="btn danger"
-                  onClick={() => handleDelete(project)}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <ProjectAdminList
+        projects={projects}
+        loading={loading}
+        onEdit={startEdit}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }

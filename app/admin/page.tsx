@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SubmissionsTable from "@/components/SubmissionsTable";
+import AdminPageHeader from "@/components/AdminPageHeader";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -11,13 +12,17 @@ export const metadata: Metadata = {
 export default function AdminPage() {
   return (
     <main className="container page">
-      <h1>Admin — Contact Submissions</h1>
-      <p className="lead">
-        Every submission from both forms, newest first, loaded live from the{" "}
-        <code>GET /api/contact</code> endpoint. Change a status with the
-        dropdown (saved via <code>PATCH</code>); deleting asks for
-        confirmation first.
-      </p>
+      <AdminPageHeader
+        title="Admin — Contact Submissions"
+        lead={
+          <>
+            Every submission from both forms, newest first, loaded live from
+            the <code>GET /api/contact</code> endpoint. Change a status with
+            the dropdown (saved via <code>PATCH</code>); deleting asks for
+            confirmation first.
+          </>
+        }
+      />
       <SubmissionsTable />
       <div className="cta-row">
         <Link href="/admin/blogs" className="btn secondary">

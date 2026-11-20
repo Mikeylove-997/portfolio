@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { Suspense } from "react";
 import ContactForm from "@/components/contact-form";
+import TechTags from "@/components/TechTags";
+import type { Project } from "@/components/ProjectCard";
 
 export default function ProjectPage(props: PageProps<"/projects/[slug]">) {
   return (
@@ -67,13 +69,7 @@ async function ProjectContent({
 
       <section className="card">
         <h2>Tech Stack</h2>
-        <ul className="pill-list">
-          {project.techStack.map((tech) => (
-            <li key={tech} className="pill">
-              {tech}
-            </li>
-          ))}
-        </ul>
+        <TechTags tags={project.techStack} />
       </section>
 
       <section className="card">
@@ -96,13 +92,3 @@ async function ProjectContent({
     </article>
   );
 }
-
-type Project = {
-  slug: string;
-  title: string;
-  description: string;
-  techStack: string[];
-  features: string[];
-  repoUrl: string;
-  liveUrl?: string;
-};

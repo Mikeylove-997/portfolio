@@ -1,22 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import type { BlogPost } from "@/components/BlogCard";
+import BlogForm from "@/components/BlogForm";
+import type { BlogFieldErrors, BlogFormState } from "@/components/BlogForm";
+import BlogAdminList from "@/components/BlogAdminList";
 
-type BlogPost = {
-  id: string;
-  slug: string;
-  title: string;
-  content: string;
-  createdAt: string;
-};
-
-type FieldErrors = {
-  title?: string;
-  content?: string;
-};
-
-const EMPTY_FORM = {
+const EMPTY_FORM: BlogFormState = {
   title: "",
   content: "",
 };
@@ -26,7 +16,7 @@ export default function BlogManager() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(EMPTY_FORM);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [fieldErrors, setFieldErrors] = useState<BlogFieldErrors>({});
   const [duplicateMessage, setDuplicateMessage] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
@@ -131,10 +121,6 @@ export default function BlogManager() {
     setFailed(false);
     setMessage(null);
 
-    if (!window.confirm("Delete this post?")) {
-      return;
-    }
-
     try {
       const res = await fetch(`/api/blogs/${post.slug}`, {
         method: "DELETE",
@@ -188,94 +174,21 @@ export default function BlogManager() {
         </p>
       ) : null}
 
-      <div className="card form-card">
-        <h2>{editingSlug ? "Edit Post" : "Write a New Post"}</h2>
-        <form onSubmit={handleSubmit} className="form" noValidate>
-          <div className="field">
-            <label htmlFor="blog-title">Title</label>
-            <input
-              id="blog-title"
-              name="title"
-              type="text"
-              placeholder="How I Built..."
-              value={form.title}
-              onChange={(event) =>
-                setForm({ ...form, title: event.target.value })
-              }
-            />
-            {fieldErrors.title ? (
-              <p className="field-error">{fieldErrors.title}</p>
-            ) : null}
-          </div>
-          <div className="field">
-            <label htmlFor="blog-content">Content</label>
-            <textarea
-              id="blog-content"
-              name="content"
-              rows={8}
-              placeholder="Write your post... Separate paragraphs with a blank line."
-              value={form.content}
-              onChange={(event) =>
-                setForm({ ...form, content: event.target.value })
-              }
-            />
-            {fieldErrors.content ? (
-              <p className="field-error">{fieldErrors.content}</p>
-            ) : null}
-          </div>
-          <button type="submit" disabled={sending}>
-            {sending
-              ? "Saving..."
-              : editingSlug
-                ? "Save Changes"
-                : "Publish Post"}
-          </button>
-        </form>
-      </div>
+      <BlogForm
+        form={form}
+        fieldErrors={fieldErrors}
+        sending={sending}
+        editingSlug={editingSlug}
+        onChange={setForm}
+        onSubmit={handleSubmit}
+      />
 
-      <h2 className="admin-list-heading">Existing Posts</h2>
-      {loading ? (
-        <p className="muted">Loading posts...</p>
-      ) : posts.length === 0 ? (
-        <p className="muted">
-          No posts yet. Use the form above to create one.
-        </p>
-      ) : (
-        <div className="card blog-list-card">
-          {posts.map((post) => (
-            <div key={post.slug} className="blog-row">
-              <div>
-                <Link href={`/blogs/${post.slug}`} className="view-link">
-                  {post.title}
-                </Link>
-                <p className="post-date">
-                  {new Date(post.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
-              </div>
-              <div className="row-actions">
-                <button
-                  type="button"
-                  className="btn secondary"
-                  onClick={() => startEdit(post)}
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  className="btn danger"
-                  onClick={() => handleDelete(post)}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <BlogAdminList
+        posts={posts}
+        loading={loading}
+        onEdit={startEdit}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }

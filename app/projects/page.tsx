@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { headers } from "next/headers";
 import { Suspense } from "react";
+import type { ComponentProps } from "react";
+import ProjectCard from "@/components/ProjectCard";
 
 export const metadata: Metadata = {
   title: "My Projects",
@@ -34,7 +35,7 @@ async function ProjectsGrid() {
   const response = await fetch(`${protocol}://${host}/api/projects`, {
     cache: "no-store",
   });
-  const projects: Project[] = response.ok ? await response.json() : [];
+  const projects: ProjectCardData[] = response.ok ? await response.json() : [];
 
   if (projects.length === 0) {
     return (
@@ -47,33 +48,10 @@ async function ProjectsGrid() {
   return (
     <div className="grid">
       {projects.map((project) => (
-        <Link
-          key={project.slug}
-          href={`/projects/${project.slug}`}
-          className="card project-card"
-        >
-          <h2>{project.title}</h2>
-          <p>{project.description}</p>
-          <ul className="pill-list">
-            {project.techStack.map((tech) => (
-              <li key={tech} className="pill">
-                {tech}
-              </li>
-            ))}
-          </ul>
-          <span className="view-link">View project →</span>
-        </Link>
+        <ProjectCard key={project.slug} project={project} />
       ))}
     </div>
   );
 }
 
-type Project = {
-  slug: string;
-  title: string;
-  description: string;
-  techStack: string[];
-  features: string[];
-  repoUrl: string;
-  liveUrl?: string;
-};
+type ProjectCardData = ComponentProps<typeof ProjectCard>["project"];

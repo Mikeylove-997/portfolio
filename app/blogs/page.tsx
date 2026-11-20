@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { headers } from "next/headers";
 import { Suspense } from "react";
+import type { ComponentProps } from "react";
+import BlogCard from "@/components/BlogCard";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -33,7 +34,7 @@ async function BlogList() {
   const response = await fetch(`${protocol}://${host}/api/blogs`, {
     cache: "no-store",
   });
-  const posts: BlogPost[] = response.ok ? await response.json() : [];
+  const posts: BlogCardData[] = response.ok ? await response.json() : [];
 
   if (posts.length === 0) {
     return (
@@ -46,40 +47,10 @@ async function BlogList() {
   return (
     <div className="grid">
       {posts.map((post) => (
-        <Link
-          key={post.slug}
-          href={`/blogs/${post.slug}`}
-          className="card project-card"
-        >
-          <p className="post-date">
-            {formatDate(post.createdAt)}
-          </p>
-          <h2>{post.title}</h2>
-          <p>{excerpt(post.content)}</p>
-          <span className="view-link">Read post →</span>
-        </Link>
+        <BlogCard key={post.slug} post={post} />
       ))}
     </div>
   );
 }
 
-type BlogPost = {
-  id: string;
-  slug: string;
-  title: string;
-  content: string;
-  createdAt: string;
-};
-
-function excerpt(content: string): string {
-  return content.length > 140
-    ? `${content.slice(0, 140).trimEnd()}...`
-    : content;
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString("en-US", {
-    dateStyle: "medium",
-    timeZone: "America/Los_Angeles",
-  });
-}
+type BlogCardData = ComponentProps<typeof BlogCard>["post"];

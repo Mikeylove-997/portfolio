@@ -6,6 +6,7 @@ import Link from "next/link";
 import ChatMessage from "@/components/ChatMessage";
 import type { ChatStoredMessage } from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
+import StarterQuestions from "@/components/StarterQuestions";
 
 const STORAGE_KEY = "mz-assistant-chat";
 const MAX_MESSAGES = 50;
@@ -170,26 +171,7 @@ export default function ChatWidget() {
               </div>
             </div>
             {messages.length === 0 ? (
-              <ChatMessage
-                message={{
-                  role: "assistant",
-                  text: "Try one of these to start:",
-                  source: null,
-                  related: [
-                    { id: "starter-1", question: "What's Mike's education?" },
-                    {
-                      id: "starter-2",
-                      question: "Tell me about the Payactiv project",
-                    },
-                    {
-                      id: "starter-3",
-                      question: "What skills does Mike have?",
-                    },
-                  ],
-                  timestamp: "starter",
-                }}
-                onAskRelated={ask}
-              />
+              <StarterQuestions onAsk={ask} />
             ) : (
               messages.map((message, index) => (
                 <ChatMessage
