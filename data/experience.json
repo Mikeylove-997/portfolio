@@ -53,5 +53,16 @@
     "industry": "Retail",
     "highlights": [],
     "skills": []
+  },
+  {
+    "id": "ccd7183b-0e9e-4dfd-986d-d804c9e5c6ca",
+    "company": "BMO(Bank of Montreal)",
+    "title": "Personal Banker",
+    "location": "",
+    "startDate": "2023-04",
+    "endDate": "2023-09",
+    "industry": "Banking",
+    "highlights": [],
+    "skills": []
   }
 ]

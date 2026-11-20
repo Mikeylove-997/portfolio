@@ -2,7 +2,7 @@
   {
     "id": "023a61a9-3641-4502-8c4c-5129334b7738",
     "question": "What do you study?",
-    "answer": "I study information systems at Santa Clara University. I like building things end to end — from Python analytics and machine learning projects to web applications with Next.js.",
+    "answer": "I study Business Analytics at Santa Clara University. I like building things end to end — from Python analytics and machine learning projects to web applications with Next.js.",
     "category": "Education",
     "keywords": [
       "education",
@@ -13,7 +13,7 @@
       "major"
     ],
     "createdAt": "2026-11-12T12:00:00.000Z",
-    "updatedAt": "2026-11-12T12:00:00.000Z"
+    "updatedAt": "2026-11-20T05:00:13.521Z"
   },
   {
     "id": "dfc86aa7-6594-4630-b39f-4506880b36c1",
